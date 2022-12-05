@@ -5,6 +5,10 @@ VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entites", "Entites\Entites.csproj", "{C9558BCD-8F63-4DD1-A38B-3D647E3BF386}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DepotSiteInternet", "DepotSiteInternet\DepotSiteInternet.csproj", "{AB935399-A574-4181-ACEF-1FA76A604DEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationCalendrierCours", "ApplicationCalendrierCours\ApplicationCalendrierCours.csproj", "{56FFE742-67D6-4FC9-B168-1A7CE4267364}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{C9558BCD-8F63-4DD1-A38B-3D647E3BF386}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9558BCD-8F63-4DD1-A38B-3D647E3BF386}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9558BCD-8F63-4DD1-A38B-3D647E3BF386}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB935399-A574-4181-ACEF-1FA76A604DEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB935399-A574-4181-ACEF-1FA76A604DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB935399-A574-4181-ACEF-1FA76A604DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB935399-A574-4181-ACEF-1FA76A604DEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56FFE742-67D6-4FC9-B168-1A7CE4267364}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56FFE742-67D6-4FC9-B168-1A7CE4267364}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56FFE742-67D6-4FC9-B168-1A7CE4267364}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56FFE742-67D6-4FC9-B168-1A7CE4267364}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
