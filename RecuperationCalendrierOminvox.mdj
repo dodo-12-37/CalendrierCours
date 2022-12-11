@@ -3373,7 +3373,7 @@
 											"top": 741,
 											"width": 99.353515625,
 											"height": 13,
-											"text": "+Prenome: string",
+											"text": "+Prenom: string",
 											"horizontalAlignment": 0
 										}
 									],
@@ -10704,7 +10704,7 @@
 									"_parent": {
 										"$ref": "AAAAAAGExSZK92dVap8="
 									},
-									"name": "Prenome",
+									"name": "Prenom",
 									"type": "string"
 								}
 							]

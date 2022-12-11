@@ -42,9 +42,7 @@ namespace DepotSiteInternet
         {
             get
             {
-                CoursInternetDTO[] listeRetour = new CoursInternetDTO[this.m_listeCours.Count];
-                this.m_listeCours.CopyTo(listeRetour);
-                return listeRetour.ToList();
+                return this.m_listeCours;
             }
             set
             {
@@ -155,9 +153,7 @@ namespace DepotSiteInternet
         {
             get
             {
-                SeanceInternetDTO[] seanceRetour = new SeanceInternetDTO[this.m_seances.Count];
-                this.m_seances.CopyTo(seanceRetour);
-                return seanceRetour.ToList();
+                return this.m_seances;
             }
             set
             {
@@ -174,11 +170,13 @@ namespace DepotSiteInternet
         #region Methodes
         public Cours VersEntites()
         {
-            throw new NotImplementedException();
+            List<Seance> Seances = this.m_seances.Select(s => s.VersEntite()).ToList();
+
+            return new Cours(this.m_enseignant.VersEntite(), this.m_intitule, Seances);
         }
         public override bool Equals(object? obj)
         {
-            return obj is Cours cours
+            return obj is CoursInternetDTO cours
                 && this.Enseignant.Equals(cours.Enseignant)
                 && Intitule == cours.Intitule;
         }
@@ -260,11 +258,11 @@ namespace DepotSiteInternet
         #region Methodes
         public Seance VersEntite()
         {
-            throw new NotImplementedException();
+            return new Seance(this.m_dateDebut, this.m_dateFin, this.m_salle);
         }
         public override bool Equals(object? obj)
         {
-            return obj is Seance seance
+            return obj is SeanceInternetDTO seance
                 && seance.DateDebut == this.DateDebut
                 && seance.DateFin == this.DateFin
                 && seance.Salle == this.Salle;
@@ -332,11 +330,11 @@ namespace DepotSiteInternet
         #region Methodes
         public Professeur VersEntite()
         {
-            throw new NotImplementedException();
+            return new Professeur(this.m_nom, this.m_prenom);
         }
         public override bool Equals(object? obj)
         {
-            return obj is Professeur professeur &&
+            return obj is ProfesseurInternetDTO professeur &&
                    Nom == professeur.Nom &&
                    Prenom == professeur.Prenom;
         }
