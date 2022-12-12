@@ -9,12 +9,25 @@ namespace DepotSiteInternet
         : IDepotCours
     {
         #region Membres
-        private const string URL_SITE_CSFOY = "https://externe5.csfoy.ca/horairecohorte/index.php";
+        private string m_urlSiteCsfoy;
+        private string m_urlSiteCsfoyCohorte;
 
         #endregion
 
         #region Ctor
+        public DepotCoursInternet()
+        {
+            this.LireFichierConfig("../../../../DepotSiteInternet/bin/Debug/net6.0/depot.config");
+        }
+        public DepotCoursInternet(string p_fichier)
+        {
+            if (String.IsNullOrWhiteSpace(p_fichier))
+            {
+                throw new ArgumentNullException("Ne doit pas etre null ou vide`", nameof(p_fichier));
+            }
 
+            this.LireFichierConfig(p_fichier);
+        }
         #endregion
 
         #region Proprietes
@@ -22,7 +35,6 @@ namespace DepotSiteInternet
         #endregion
 
         #region Methodes
-
         public List<Cohorte> RecupererCohortes()
         {
             string? contenuInternet = this.RecupererContenu();
@@ -50,7 +62,7 @@ namespace DepotSiteInternet
         }
         public List<Cours> RecupererCours(Cohorte p_cohorte)
         {
-            string url = URL_SITE_CSFOY + "?cohorte=" + p_cohorte.Numero;
+            string url = m_urlSiteCsfoyCohorte + p_cohorte.Numero;
             Regex regexHeures = new Regex("[0-9]{1,2}:[0-9]{2}");
             Regex regexSemaines = new Regex("[0-9]{2}-[0-9]{2}-[0-9]{2}");
             Regex regexJours = new Regex("([0-9]{2,3}px)+.*(ligne1|vide){1}");
@@ -65,19 +77,19 @@ namespace DepotSiteInternet
 
             List<string> lignesContenuInternet = CouperLignesTexte(contenuInternet);
             List<Cours> listeRetour = new List<Cours>();
-            lignesContenuInternet = lignesContenuInternet
-                .Select(l => l.Trim())
-                .Where(l => regexJours.IsMatch(l) || regexSemaines.IsMatch(l) || regexHeures.IsMatch(l))
-                .ToList();
+            //lignesContenuInternet = lignesContenuInternet
+            //    .Select(l => l.Trim())
+            //    .Where(l => regexJours.IsMatch(l) || regexSemaines.IsMatch(l) || regexHeures.IsMatch(l))
+            //    .ToList();
             try
             {
-                listeRetour = TransformerLignesEnCoursInternetDTO(lignesContenuInternet)
+                listeRetour = this.TransformerLignesEnCoursInternetDTO(lignesContenuInternet)
                     .Select(cDTO => cDTO.VersEntites())
                     .ToList();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                throw new InvalidDepotException("Erreur dans l'interprétation du contenu du site", e);
             }
 
             return listeRetour;
@@ -89,7 +101,7 @@ namespace DepotSiteInternet
 
             if (p_url is null)
             {
-                url = URL_SITE_CSFOY;
+                url = m_urlSiteCsfoy;
             }
             else
             {
@@ -122,12 +134,13 @@ namespace DepotSiteInternet
 
             Regex regexHeures = new Regex("(?<heure>[0-9]{1,2}):(?<minute>[0-9]{2})");
             Regex regexSemaines = new Regex("(?<semaine>[0-9]{4}-[0-9]{2}-[0-9]{2})");
-            Regex regexCours = new Regex("ligne1");
+            Regex regexCours = new Regex("([0-9]{2,3}px)+.*ligne1");
             Regex regexVide = new Regex("class=\"vide\"");
             Regex taille = new Regex("(?<taille>[0-9]{2,3})px");
 
             int compteurHeure = -1;
             int tailleHeure = -1;
+
             DateTime premierJourSemaine = new DateTime();
             List<DateTime> horaires = new List<DateTime>();
 
@@ -166,8 +179,7 @@ namespace DepotSiteInternet
                     int tempsCours = int.Parse(taille.Match(l).Groups["taille"].Value) / tailleHeure;
                     DateTime dateFin = horaires[horaires.Count - compteurHeure + tempsCours];
 
-                    CoursInternetDTO nvCours = TransformerLigneNouvelleSeance(l, dateDebut, dateFin);
-
+                    CoursInternetDTO nvCours = this.TransformerLigneNouvelleSeance(l, dateDebut, dateFin);
                     CoursInternetDTO? coursExistant = listeRetour.SingleOrDefault(c => c.Equals(nvCours));
 
                     if (coursExistant != default)
@@ -185,11 +197,7 @@ namespace DepotSiteInternet
                 if ((matchCours.Success || matchVide.Success) && compteurHeure == 0)
                 {
                     List<DateTime> nvHoraires = horaires
-                        .Select(h =>
-                        {
-                            DateTime dt = h.AddDays(1);
-                            return dt;
-                        })
+                        .Select(h => h.AddDays(1))
                         .ToList();
                     horaires = nvHoraires;
                     compteurHeure = horaires.Count;
@@ -206,10 +214,8 @@ namespace DepotSiteInternet
             int PositionNomProf = 0, positionPrenomProf = 1;
 
             string info = regexSeance.Match(p_ligne).Groups["infos"].Value;
-
             string[] infos = info.Split("<br>");
             infos[positionSalle] = infos[positionSalle].Replace("</td></tr>", "");
-
             string nomCours = regexNumeroCours.Match(infos[positionNumero]).Groups["cours"].Value + " " + infos[positionIntitule];
             string[] professeur = infos[positionProf].Split(", ");
 
@@ -220,7 +226,32 @@ namespace DepotSiteInternet
 
             return nvCours;
         }
+        private void LireFichierConfig(string p_fichier)
+        {
+            if (!File.Exists(p_fichier))
+            {
+                throw new ArgumentException("Le fichier doit exister", nameof(p_fichier));
+            }
 
+            string contenu = "";
+
+            using (StreamReader sr = new StreamReader(p_fichier))
+            {
+                contenu = sr.ReadToEnd();
+            }
+
+            try
+            {
+                string[] contenuLigne = contenu.Split("\r\n");
+                this.m_urlSiteCsfoy= contenuLigne[1].Split(",")[1];
+                this.m_urlSiteCsfoyCohorte= contenuLigne[2].Split(",")[1];
+            }
+            catch (Exception e)
+            {
+                throw new InvalidDepotException("Le fichier de configuration est corrompu", e);
+            }
+
+        }
         #endregion
 
     }
