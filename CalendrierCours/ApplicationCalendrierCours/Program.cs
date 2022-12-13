@@ -1,6 +1,4 @@
-﻿
-
-using DepotSiteInternet;
+﻿using DepotSiteInternet;
 using Entites;
 using System.Globalization;
 using System.Net;

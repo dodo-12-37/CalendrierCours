@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entites", "Entites\Entites.csproj", "{C9558BCD-8F63-4DD1-A38B-3D647E3BF386}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entites", "Entites\Entites.csproj", "{C9558BCD-8F63-4DD1-A38B-3D647E3BF386}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DepotSiteInternet", "DepotSiteInternet\DepotSiteInternet.csproj", "{AB935399-A574-4181-ACEF-1FA76A604DEC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DepotSiteInternet", "DepotSiteInternet\DepotSiteInternet.csproj", "{AB935399-A574-4181-ACEF-1FA76A604DEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationCalendrierCours", "ApplicationCalendrierCours\ApplicationCalendrierCours.csproj", "{56FFE742-67D6-4FC9-B168-1A7CE4267364}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationCalendrierCours", "ApplicationCalendrierCours\ApplicationCalendrierCours.csproj", "{56FFE742-67D6-4FC9-B168-1A7CE4267364}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BL", "BL\BL.csproj", "{B0E91657-C109-43BD-B191-656BFAA896EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{56FFE742-67D6-4FC9-B168-1A7CE4267364}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56FFE742-67D6-4FC9-B168-1A7CE4267364}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56FFE742-67D6-4FC9-B168-1A7CE4267364}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0E91657-C109-43BD-B191-656BFAA896EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0E91657-C109-43BD-B191-656BFAA896EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0E91657-C109-43BD-B191-656BFAA896EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0E91657-C109-43BD-B191-656BFAA896EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
