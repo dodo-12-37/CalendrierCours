@@ -1,16 +1,18 @@
 ﻿using CalendrierCours.Entites;
+using System.Globalization;
+using System.Text;
 
-namespace CalendrierCours.DAL.SiteInternet
+namespace CalendrierCours.ConsoleUI
 {
-    public class CohorteInternetDTO
+    public class CohorteViewModelConsole
     {
         #region Membres
-        private List<CoursInternetDTO> m_listeCours;
+        private List<CoursViewModelConsole> m_listeCours;
         private string m_numero;
         #endregion
 
         #region Ctor
-        public CohorteInternetDTO(string p_numero)
+        public CohorteViewModelConsole(string p_numero)
         {
             if (String.IsNullOrWhiteSpace(p_numero))
             {
@@ -18,9 +20,9 @@ namespace CalendrierCours.DAL.SiteInternet
             }
 
             this.Numero = p_numero;
-            this.m_listeCours = new List<CoursInternetDTO>();
+            this.m_listeCours = new List<CoursViewModelConsole>();
         }
-        public CohorteInternetDTO(List<Cours> p_listeCours, string p_numero)
+        public CohorteViewModelConsole(List<CoursViewModelConsole> p_listeCours, string p_numero)
         {
             if (p_listeCours is null)
             {
@@ -31,14 +33,16 @@ namespace CalendrierCours.DAL.SiteInternet
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
             }
 
-            this.m_listeCours = p_listeCours.Select(c => new CoursInternetDTO(c)).ToList();
+            this.m_listeCours = p_listeCours;
             this.m_numero = p_numero;
         }
-        public CohorteInternetDTO(Cohorte p_cohorte) : this(p_cohorte.Cours, p_cohorte.Numero) { }
+        public CohorteViewModelConsole(Cohorte p_cohorte) 
+            : this(p_cohorte.Cours.Select(c => new CoursViewModelConsole(c)).ToList(), p_cohorte.Numero)
+        { }
         #endregion
 
         #region Proprietes
-        public List<CoursInternetDTO> ListeCours
+        public List<CoursViewModelConsole> ListeCours
         {
             get
             {
@@ -74,18 +78,30 @@ namespace CalendrierCours.DAL.SiteInternet
 
             return new Cohorte(listeCours, this.Numero);
         }
+        public override string ToString()
+        {
+            int positionPeriode = 1, positionNumero = 2;
+            string[] elementsCohorte = this.m_numero.Split('_');
+
+            return $"Cohorte n° {elementsCohorte[positionNumero]} - période : {elementsCohorte[positionPeriode]}";
+        }
+        public override bool Equals(object? obj)
+        {
+            return obj is CohorteViewModelConsole cohorte
+                && cohorte.Numero == this.m_numero;
+        }
         #endregion
     }
-    public class CoursInternetDTO
+    public class CoursViewModelConsole
     {
         #region Membres
-        private ProfesseurInternetDTO m_enseignant;
+        private ProfesseurViewModelConsole m_enseignant;
         private string m_intitule;
-        private List<SeanceInternetDTO> m_seances;
+        private List<SeanceViewModelConsole> m_seances;
         #endregion
 
         #region Ctor
-        public CoursInternetDTO(ProfesseurInternetDTO p_enseignant, string p_intitule)
+        public CoursViewModelConsole(ProfesseurViewModelConsole p_enseignant, string p_intitule)
         {
             if (p_enseignant is null)
             {
@@ -98,9 +114,9 @@ namespace CalendrierCours.DAL.SiteInternet
 
             this.m_enseignant = p_enseignant;
             this.m_intitule = p_intitule;
-            this.m_seances = new List<SeanceInternetDTO>();
+            this.m_seances = new List<SeanceViewModelConsole>();
         }
-        public CoursInternetDTO(ProfesseurInternetDTO p_enseignant, string p_intitule, List<SeanceInternetDTO> p_seances)
+        public CoursViewModelConsole(ProfesseurViewModelConsole p_enseignant, string p_intitule, List<SeanceViewModelConsole> p_seances)
         {
             if (p_enseignant is null)
             {
@@ -119,13 +135,13 @@ namespace CalendrierCours.DAL.SiteInternet
             this.m_intitule = p_intitule;
             this.m_seances = p_seances;
         }
-        public CoursInternetDTO(Cours p_cours)
-            : this(new ProfesseurInternetDTO(p_cours.Enseignant), p_cours.Intitule, p_cours.Seances.Select(s => new SeanceInternetDTO(s)).ToList())
+        public CoursViewModelConsole(Cours p_cours) 
+            : this(new ProfesseurViewModelConsole(p_cours.Enseignant), p_cours.Intitule, p_cours.Seances.Select(s => new SeanceViewModelConsole(s)).ToList()) 
         { }
         #endregion
 
         #region Proprietes
-        public ProfesseurInternetDTO Enseignant
+        public ProfesseurViewModelConsole Enseignant
         {
             get { return this.m_enseignant; }
             set
@@ -151,7 +167,7 @@ namespace CalendrierCours.DAL.SiteInternet
                 this.m_intitule = value;
             }
         }
-        public List<SeanceInternetDTO> Seances
+        public List<SeanceViewModelConsole> Seances
         {
             get
             {
@@ -176,9 +192,22 @@ namespace CalendrierCours.DAL.SiteInternet
 
             return new Cours(this.m_enseignant.VersEntite(), this.m_intitule, Seances);
         }
+        public override string ToString()
+        {
+            int positionNumero = 0, positionIntitule = 1;
+            string[] elementsIntitule = this.m_intitule.Split(" - ");
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append($"Cours n° {elementsIntitule[positionNumero]} - {elementsIntitule[positionIntitule]} ");
+            sb.Append($"donné par {this.Enseignant.ToString()} ");
+            sb.AppendLine($"- Nombre de séances : {this.Seances.Count}");
+            this.m_seances.ForEach(s => sb.AppendLine($"\t{s.ToString()}"));
+
+            return sb.ToString();
+        }
         public override bool Equals(object? obj)
         {
-            return obj is CoursInternetDTO cours
+            return obj is CoursViewModelConsole cours
                 && this.Enseignant.Equals(cours.Enseignant)
                 && Intitule == cours.Intitule;
         }
@@ -188,7 +217,7 @@ namespace CalendrierCours.DAL.SiteInternet
         }
         #endregion
     }
-    public class SeanceInternetDTO
+    public class SeanceViewModelConsole
     {
         #region Membres
         private DateTime m_dateDebut;
@@ -197,7 +226,7 @@ namespace CalendrierCours.DAL.SiteInternet
         #endregion
 
         #region Ctor
-        public SeanceInternetDTO(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
+        public SeanceViewModelConsole(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
         {
             if (p_dateDebut >= p_dateFin)
             {
@@ -212,7 +241,7 @@ namespace CalendrierCours.DAL.SiteInternet
             this.m_dateFin = p_dateFin;
             this.m_salle = p_salle;
         }
-        public SeanceInternetDTO(Seance p_seance) : this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle) { }
+        public SeanceViewModelConsole(Seance p_seance) : this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle) { }
         #endregion
 
         #region Proprietes
@@ -262,9 +291,20 @@ namespace CalendrierCours.DAL.SiteInternet
         {
             return new Seance(this.m_dateDebut, this.m_dateFin, this.m_salle);
         }
+        public override string ToString()
+        {
+            CultureInfo cultureInfo= CultureInfo.CreateSpecificCulture("fr-CA");
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append($"Le {this.m_dateDebut.ToString("dddd dd MMMM yyyy", cultureInfo)} ");
+            sb.Append($"de {this.m_dateDebut.ToString("HH:mm", cultureInfo)}" );
+            sb.Append($" à {this.m_dateFin.ToString("HH:mm", cultureInfo)}" );
+
+            return sb.ToString();
+        }
         public override bool Equals(object? obj)
         {
-            return obj is SeanceInternetDTO seance
+            return obj is SeanceViewModelConsole seance
                 && seance.DateDebut == this.DateDebut
                 && seance.DateFin == this.DateFin
                 && seance.Salle == this.Salle;
@@ -275,7 +315,7 @@ namespace CalendrierCours.DAL.SiteInternet
         }
         #endregion
     }
-    public class ProfesseurInternetDTO
+    public class ProfesseurViewModelConsole
     {
         #region Membres
         private string m_nom;
@@ -283,7 +323,7 @@ namespace CalendrierCours.DAL.SiteInternet
         #endregion
 
         #region Ctor
-        public ProfesseurInternetDTO(string p_nom, string p_prenom)
+        public ProfesseurViewModelConsole(string p_nom, string p_prenom)
         {
             if (String.IsNullOrWhiteSpace(p_nom))
             {
@@ -297,7 +337,7 @@ namespace CalendrierCours.DAL.SiteInternet
             this.m_nom = p_nom;
             this.m_prenom = p_prenom;
         }
-        public ProfesseurInternetDTO(Professeur p_enseigant) : this(p_enseigant.Nom, p_enseigant.Prenom) { }
+        public ProfesseurViewModelConsole(Professeur p_enseignant) : this(p_enseignant.Nom, p_enseignant.Prenom) { }
         #endregion
 
         #region Proprietes
@@ -334,9 +374,13 @@ namespace CalendrierCours.DAL.SiteInternet
         {
             return new Professeur(this.m_nom, this.m_prenom);
         }
+        public override string ToString()
+        {
+            return $"{this.m_prenom} {this.m_nom}";
+        }
         public override bool Equals(object? obj)
         {
-            return obj is ProfesseurInternetDTO professeur &&
+            return obj is ProfesseurViewModelConsole professeur &&
                    Nom == professeur.Nom &&
                    Prenom == professeur.Prenom;
         }
@@ -346,4 +390,5 @@ namespace CalendrierCours.DAL.SiteInternet
         }
         #endregion
     }
+
 }

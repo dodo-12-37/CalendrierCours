@@ -35,7 +35,7 @@
         #endregion
 
         #region Proprietes
-        public List<Cours> ListeCours
+        public List<Cours> Cours
         {
             get
             {
@@ -67,7 +67,11 @@
         #endregion
 
         #region Methodes
-
+        public override bool Equals(object? obj)
+        {
+            return obj is Cohorte cohorte
+                && cohorte.m_numero == this.m_numero;
+        }
         #endregion
     }
     public class Cours

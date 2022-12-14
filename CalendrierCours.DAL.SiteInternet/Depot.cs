@@ -67,10 +67,7 @@ namespace CalendrierCours.DAL.SiteInternet
 
             List<string> lignesContenuInternet = CouperLignesTexte(contenuInternet);
             List<Cours> listeRetour = new List<Cours>();
-            //lignesContenuInternet = lignesContenuInternet
-            //    .Select(l => l.Trim())
-            //    .Where(l => regexJours.IsMatch(l) || regexSemaines.IsMatch(l) || regexHeures.IsMatch(l))
-            //    .ToList();
+
             try
             {
                 listeRetour = this.TransformerLignesEnCoursInternetDTO(lignesContenuInternet)
@@ -206,7 +203,7 @@ namespace CalendrierCours.DAL.SiteInternet
             string info = regexSeance.Match(p_ligne).Groups["infos"].Value;
             string[] infos = info.Split("<br>");
             infos[positionSalle] = infos[positionSalle].Replace("</td></tr>", "");
-            string nomCours = regexNumeroCours.Match(infos[positionNumero]).Groups["cours"].Value + " " + infos[positionIntitule];
+            string nomCours = regexNumeroCours.Match(infos[positionNumero]).Groups["cours"].Value + " - " + infos[positionIntitule];
             string[] professeur = infos[positionProf].Split(", ");
 
             ProfesseurInternetDTO nvProf = new ProfesseurInternetDTO(professeur[PositionNomProf], professeur[positionPrenomProf]);

@@ -1,5 +1,4 @@
 ﻿using CalendrierCours.Entites;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace CalendrierCours.BL
@@ -105,7 +104,7 @@ namespace CalendrierCours.BL
 
             this.MiseAJourCache(p_cohorte);
 
-            return Cache.Cours;
+            return Cache.Cohorte.Cours;
         }
         public List<Seance> ListerSeances(Cohorte p_cohorte, Cours p_cours)
         {
@@ -123,9 +122,9 @@ namespace CalendrierCours.BL
             List<Seance> seancesRetour = new List<Seance>();
             this.ListerCours(p_cohorte);
 
-            if (Cache.Cours.Contains(p_cours))
+            if (Cache.Cohorte.Cours.Contains(p_cours))
             {
-                seancesRetour = Cache.Cours.Single(c => c.Equals(p_cours)).Seances;
+                seancesRetour = Cache.Cohorte.Cours.Single(c => c.Equals(p_cours)).Seances;
             }
 
             return seancesRetour;
@@ -195,7 +194,7 @@ namespace CalendrierCours.BL
 
             this.MiseAJourCache(p_cohorte);
 
-            Cours coursAChanger = Cache.Cours.SingleOrDefault(c => c.Equals(p_cours));
+            Cours coursAChanger = Cache.Cohorte.Cours.SingleOrDefault(c => c.Equals(p_cours));
 
             if (coursAChanger is null)
             {
@@ -226,7 +225,7 @@ namespace CalendrierCours.BL
 
             this.MiseAJourCache(p_cohorte);
 
-            Cache.Cours.Single(c => c.Enseignant.Equals(p_enseignant)).Enseignant.Nom = p_nom;
+            Cache.Cohorte.Cours.Single(c => c.Enseignant.Equals(p_enseignant)).Enseignant.Nom = p_nom;
         }
         public void ModifierPrenomProfesseur(Cohorte p_cohorte, Professeur p_enseignant, string p_prenom)
         {
@@ -245,7 +244,7 @@ namespace CalendrierCours.BL
 
             this.MiseAJourCache(p_cohorte);
 
-            Cache.Cours.Single(c => c.Enseignant.Equals(p_enseignant)).Enseignant.Prenom = p_prenom;
+            Cache.Cohorte.Cours.Single(c => c.Enseignant.Equals(p_enseignant)).Enseignant.Prenom = p_prenom;
         }
         private void MiseAJourCache(Cohorte p_cohorte)
         {
@@ -257,10 +256,9 @@ namespace CalendrierCours.BL
             if (!Cache.Cohorte.Equals(p_cohorte))
             {
                 Cache.Cohorte = p_cohorte;
-                Cache.Cours = this.m_depot.RecupererCours(p_cohorte);
+                Cache.Cohorte.Cours = this.m_depot.RecupererCours(p_cohorte);
             }
         }
-
         #endregion
     }
 }

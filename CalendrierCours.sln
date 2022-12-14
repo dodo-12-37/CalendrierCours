@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalendrierCours.Entites", "CalendrierCours.Entites\CalendrierCours.Entites.csproj", "{BD1930BF-9E44-4421-A6F2-F013103D5DAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalendrierCours.Entites", "CalendrierCours.Entites\CalendrierCours.Entites.csproj", "{BD1930BF-9E44-4421-A6F2-F013103D5DAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalendrierCours.DAL.SiteInternet", "CalendrierCours.DAL.SiteInternet\CalendrierCours.DAL.SiteInternet.csproj", "{2BD75550-8A31-402D-BAC5-CAC502053603}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalendrierCours.DAL.SiteInternet", "CalendrierCours.DAL.SiteInternet\CalendrierCours.DAL.SiteInternet.csproj", "{2BD75550-8A31-402D-BAC5-CAC502053603}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalendrierCours.BL", "CalendrierCours.BL\CalendrierCours.BL.csproj", "{8BB3A593-9223-46B8-AD3F-904FF74F7E41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalendrierCours.BL", "CalendrierCours.BL\CalendrierCours.BL.csproj", "{8BB3A593-9223-46B8-AD3F-904FF74F7E41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalendrierCours.ConsoleUI", "CalendrierCours.ConsoleUI\CalendrierCours.ConsoleUI.csproj", "{23718A30-4253-4190-BD5E-19F8B4D823F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{8BB3A593-9223-46B8-AD3F-904FF74F7E41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BB3A593-9223-46B8-AD3F-904FF74F7E41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BB3A593-9223-46B8-AD3F-904FF74F7E41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23718A30-4253-4190-BD5E-19F8B4D823F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23718A30-4253-4190-BD5E-19F8B4D823F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23718A30-4253-4190-BD5E-19F8B4D823F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23718A30-4253-4190-BD5E-19F8B4D823F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
