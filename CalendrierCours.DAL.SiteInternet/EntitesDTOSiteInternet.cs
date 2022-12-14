@@ -1,24 +1,26 @@
-﻿namespace Entites
+﻿using CalendrierCours.Entites;
+
+namespace CalendrierCours.DAL.SiteInternet
 {
-    public class Cohorte
+    public class CohorteInternetDTO
     {
         #region Membres
-        private List<Cours> m_listeCours;
+        private List<CoursInternetDTO> m_listeCours;
         private string m_numero;
         #endregion
 
-        #region Ctors
-        public Cohorte(string p_numero)
+        #region Ctor
+        public CohorteInternetDTO(string p_numero)
         {
             if (String.IsNullOrWhiteSpace(p_numero))
             {
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
             }
 
-            this.m_numero = p_numero;
-            this.m_listeCours = new List<Cours>();
+            this.Numero = p_numero;
+            this.m_listeCours = new List<CoursInternetDTO>();
         }
-        public Cohorte(List<Cours> p_listeCours, string p_numero)
+        public CohorteInternetDTO(List<CoursInternetDTO> p_listeCours, string p_numero)
         {
             if (p_listeCours is null)
             {
@@ -35,13 +37,11 @@
         #endregion
 
         #region Proprietes
-        public List<Cours> ListeCours
+        public List<CoursInternetDTO> ListeCours
         {
             get
             {
-                Cours[] listeRetour = new Cours[this.m_listeCours.Count];
-                this.m_listeCours.CopyTo(listeRetour);
-                return listeRetour.ToList();
+                return this.m_listeCours;
             }
             set
             {
@@ -67,20 +67,25 @@
         #endregion
 
         #region Methodes
+        public Cohorte VersEntite()
+        {
+            List<Cours> listeCours = this.m_listeCours.Select(cDTo => cDTo.VersEntites()).ToList();
 
+            return new Cohorte(listeCours, this.Numero);
+        }
         #endregion
     }
 
-    public class Cours
+    public class CoursInternetDTO
     {
         #region Membres
-        private Professeur m_enseignant;
+        private ProfesseurInternetDTO m_enseignant;
         private string m_intitule;
-        private List<Seance> m_seances;
+        private List<SeanceInternetDTO> m_seances;
         #endregion
 
         #region Ctor
-        public Cours(Professeur p_enseignant, string p_intitule)
+        public CoursInternetDTO(ProfesseurInternetDTO p_enseignant, string p_intitule)
         {
             if (p_enseignant is null)
             {
@@ -93,9 +98,9 @@
 
             this.m_enseignant = p_enseignant;
             this.m_intitule = p_intitule;
-            this.m_seances = new List<Seance>();
+            this.m_seances = new List<SeanceInternetDTO>();
         }
-        public Cours(Professeur p_enseignant, string p_intitule, List<Seance> p_seances)
+        public CoursInternetDTO(ProfesseurInternetDTO p_enseignant, string p_intitule, List<SeanceInternetDTO> p_seances)
         {
             if (p_enseignant is null)
             {
@@ -117,7 +122,7 @@
         #endregion
 
         #region Proprietes
-        public Professeur Enseignant
+        public ProfesseurInternetDTO Enseignant
         {
             get { return this.m_enseignant; }
             set
@@ -143,13 +148,11 @@
                 this.m_intitule = value;
             }
         }
-        public List<Seance> Seances
+        public List<SeanceInternetDTO> Seances
         {
             get
             {
-                Seance[] seanceRetour = new Seance[this.m_seances.Count];
-                this.m_seances.CopyTo(seanceRetour);
-                return seanceRetour.ToList();
+                return this.m_seances;
             }
             set
             {
@@ -164,9 +167,15 @@
         #endregion
 
         #region Methodes
+        public Cours VersEntites()
+        {
+            List<Seance> Seances = this.m_seances.Select(s => s.VersEntite()).ToList();
+
+            return new Cours(this.m_enseignant.VersEntite(), this.m_intitule, Seances);
+        }
         public override bool Equals(object? obj)
         {
-            return obj is Cours cours
+            return obj is CoursInternetDTO cours
                 && this.Enseignant.Equals(cours.Enseignant)
                 && Intitule == cours.Intitule;
         }
@@ -177,7 +186,7 @@
         #endregion
     }
 
-    public class Seance
+    public class SeanceInternetDTO
     {
         #region Membres
         private DateTime m_dateDebut;
@@ -186,7 +195,7 @@
         #endregion
 
         #region Ctor
-        public Seance(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
+        public SeanceInternetDTO(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
         {
             if (p_dateDebut >= p_dateFin)
             {
@@ -246,9 +255,13 @@
         #endregion
 
         #region Methodes
+        public Seance VersEntite()
+        {
+            return new Seance(this.m_dateDebut, this.m_dateFin, this.m_salle);
+        }
         public override bool Equals(object? obj)
         {
-            return obj is Seance seance
+            return obj is SeanceInternetDTO seance
                 && seance.DateDebut == this.DateDebut
                 && seance.DateFin == this.DateFin
                 && seance.Salle == this.Salle;
@@ -260,7 +273,7 @@
         #endregion
     }
 
-    public class Professeur
+    public class ProfesseurInternetDTO
     {
         #region Membres
         private string m_nom;
@@ -268,7 +281,7 @@
         #endregion
 
         #region Ctor
-        public Professeur(string p_nom, string p_prenom)
+        public ProfesseurInternetDTO(string p_nom, string p_prenom)
         {
             if (String.IsNullOrWhiteSpace(p_nom))
             {
@@ -314,9 +327,13 @@
         #endregion
 
         #region Methodes
+        public Professeur VersEntite()
+        {
+            return new Professeur(this.m_nom, this.m_prenom);
+        }
         public override bool Equals(object? obj)
         {
-            return obj is Professeur professeur &&
+            return obj is ProfesseurInternetDTO professeur &&
                    Nom == professeur.Nom &&
                    Prenom == professeur.Prenom;
         }

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Entites;
+﻿using CalendrierCours.Entites;
 
-namespace BL
+namespace CalendrierCours.BL
 {
     internal static class Cache
     {

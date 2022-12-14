@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Entites;
+﻿using CalendrierCours.Entites;
 
-namespace BL
+namespace CalendrierCours.BL
 {
     public class Traitement
     {
         #region Membres
-        IDepotCours m_depot;
+        private IDepotCours m_depot;
         #endregion
 
         #region Ctor
@@ -105,10 +100,10 @@ namespace BL
             }
 
             List<Cours> cours = this.ListerCours(p_cohorte).Where(c => c.Enseignant.Equals(p_professeur)).ToList();
-            List<Seance> seancesRetour = cours
-                .SelectMany(c => c.Seances
-                    .Select(s => s.DateDebut >= p_date))
-                .ToList();
+            //List<Seance> seancesRetour = cours
+            //    .SelectMany(c => c.Seances
+            //        .Select(s => s.DateDebut >= p_date))
+            //    .ToList();
 
             throw new NotImplementedException();
         }

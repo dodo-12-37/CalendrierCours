@@ -1,4 +1,4 @@
-﻿namespace Entites
+﻿namespace CalendrierCours.Entites
 {
     public interface IInterfaceUtilisateur
     {
@@ -12,10 +12,9 @@
         void ExporterVersFichier(string p_chemin);
     }
 
-    public interface IDepotCours 
+    public interface IDepotCours
     {
         List<Cohorte> RecupererCohortes();
         List<Cours> RecupererCours(Cohorte p_cohorte);
     }
-
 }

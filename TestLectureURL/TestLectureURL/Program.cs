@@ -1,3 +1,0 @@
-﻿using TestLectureURL;
-
-TestLecture.Lecture();

@@ -1,11 +1,10 @@
-﻿using Entites;
-using System.Net;
+﻿using System.Net;
 using System.Text.RegularExpressions;
-using System.Xml;
+using CalendrierCours.Entites;
 
-namespace DepotSiteInternet
+namespace CalendrierCours.DAL.SiteInternet
 {
-    public class DepotCoursInternet
+    public class DepotSiteInternet
         : IDepotCours
     {
         #region Membres
@@ -15,11 +14,11 @@ namespace DepotSiteInternet
         #endregion
 
         #region Ctor
-        public DepotCoursInternet()
+        public DepotSiteInternet()
         {
             this.LireFichierConfig("../../../../DepotSiteInternet/bin/Debug/net6.0/depot.config");
         }
-        public DepotCoursInternet(string p_fichier)
+        public DepotSiteInternet(string p_fichier)
         {
             if (String.IsNullOrWhiteSpace(p_fichier))
             {
@@ -243,8 +242,8 @@ namespace DepotSiteInternet
             try
             {
                 string[] contenuLigne = contenu.Split("\r\n");
-                this.m_urlSiteCsfoy= contenuLigne[1].Split(",")[1];
-                this.m_urlSiteCsfoyCohorte= contenuLigne[2].Split(",")[1];
+                this.m_urlSiteCsfoy = contenuLigne[1].Split(",")[1];
+                this.m_urlSiteCsfoyCohorte = contenuLigne[2].Split(",")[1];
             }
             catch (Exception e)
             {

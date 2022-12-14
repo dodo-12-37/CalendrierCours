@@ -1,27 +1,24 @@
-﻿using Entites;
-using System.Net.Http.Headers;
-
-namespace DepotSiteInternet
+﻿namespace CalendrierCours.Entites
 {
-    public class CohorteInternetDTO
+    public class Cohorte
     {
         #region Membres
-        private List<CoursInternetDTO> m_listeCours;
+        private List<Cours> m_listeCours;
         private string m_numero;
         #endregion
 
-        #region Ctor
-        public CohorteInternetDTO(string p_numero)
+        #region Ctors
+        public Cohorte(string p_numero)
         {
             if (String.IsNullOrWhiteSpace(p_numero))
             {
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
             }
 
-            this.Numero = p_numero;
-            this.m_listeCours = new List<CoursInternetDTO>();
+            this.m_numero = p_numero;
+            this.m_listeCours = new List<Cours>();
         }
-        public CohorteInternetDTO(List<CoursInternetDTO> p_listeCours, string p_numero)
+        public Cohorte(List<Cours> p_listeCours, string p_numero)
         {
             if (p_listeCours is null)
             {
@@ -38,11 +35,13 @@ namespace DepotSiteInternet
         #endregion
 
         #region Proprietes
-        public List<CoursInternetDTO> ListeCours
+        public List<Cours> ListeCours
         {
             get
             {
-                return this.m_listeCours;
+                Cours[] listeRetour = new Cours[this.m_listeCours.Count];
+                this.m_listeCours.CopyTo(listeRetour);
+                return listeRetour.ToList();
             }
             set
             {
@@ -68,25 +67,20 @@ namespace DepotSiteInternet
         #endregion
 
         #region Methodes
-        public Cohorte VersEntite()
-        {
-            List<Cours> listeCours = this.m_listeCours.Select(cDTo => cDTo.VersEntites()).ToList();
 
-            return new Cohorte(listeCours, this.Numero);
-        }
         #endregion
     }
 
-    public class CoursInternetDTO
+    public class Cours
     {
         #region Membres
-        private ProfesseurInternetDTO m_enseignant;
+        private Professeur m_enseignant;
         private string m_intitule;
-        private List<SeanceInternetDTO> m_seances;
+        private List<Seance> m_seances;
         #endregion
 
         #region Ctor
-        public CoursInternetDTO(ProfesseurInternetDTO p_enseignant, string p_intitule)
+        public Cours(Professeur p_enseignant, string p_intitule)
         {
             if (p_enseignant is null)
             {
@@ -99,9 +93,9 @@ namespace DepotSiteInternet
 
             this.m_enseignant = p_enseignant;
             this.m_intitule = p_intitule;
-            this.m_seances = new List<SeanceInternetDTO>();
+            this.m_seances = new List<Seance>();
         }
-        public CoursInternetDTO(ProfesseurInternetDTO p_enseignant, string p_intitule, List<SeanceInternetDTO> p_seances)
+        public Cours(Professeur p_enseignant, string p_intitule, List<Seance> p_seances)
         {
             if (p_enseignant is null)
             {
@@ -123,7 +117,7 @@ namespace DepotSiteInternet
         #endregion
 
         #region Proprietes
-        public ProfesseurInternetDTO Enseignant
+        public Professeur Enseignant
         {
             get { return this.m_enseignant; }
             set
@@ -149,11 +143,13 @@ namespace DepotSiteInternet
                 this.m_intitule = value;
             }
         }
-        public List<SeanceInternetDTO> Seances
+        public List<Seance> Seances
         {
             get
             {
-                return this.m_seances;
+                Seance[] seanceRetour = new Seance[this.m_seances.Count];
+                this.m_seances.CopyTo(seanceRetour);
+                return seanceRetour.ToList();
             }
             set
             {
@@ -168,15 +164,9 @@ namespace DepotSiteInternet
         #endregion
 
         #region Methodes
-        public Cours VersEntites()
-        {
-            List<Seance> Seances = this.m_seances.Select(s => s.VersEntite()).ToList();
-
-            return new Cours(this.m_enseignant.VersEntite(), this.m_intitule, Seances);
-        }
         public override bool Equals(object? obj)
         {
-            return obj is CoursInternetDTO cours
+            return obj is Cours cours
                 && this.Enseignant.Equals(cours.Enseignant)
                 && Intitule == cours.Intitule;
         }
@@ -187,7 +177,7 @@ namespace DepotSiteInternet
         #endregion
     }
 
-    public class SeanceInternetDTO
+    public class Seance
     {
         #region Membres
         private DateTime m_dateDebut;
@@ -196,7 +186,7 @@ namespace DepotSiteInternet
         #endregion
 
         #region Ctor
-        public SeanceInternetDTO(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
+        public Seance(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
         {
             if (p_dateDebut >= p_dateFin)
             {
@@ -256,13 +246,9 @@ namespace DepotSiteInternet
         #endregion
 
         #region Methodes
-        public Seance VersEntite()
-        {
-            return new Seance(this.m_dateDebut, this.m_dateFin, this.m_salle);
-        }
         public override bool Equals(object? obj)
         {
-            return obj is SeanceInternetDTO seance
+            return obj is Seance seance
                 && seance.DateDebut == this.DateDebut
                 && seance.DateFin == this.DateFin
                 && seance.Salle == this.Salle;
@@ -274,7 +260,7 @@ namespace DepotSiteInternet
         #endregion
     }
 
-    public class ProfesseurInternetDTO
+    public class Professeur
     {
         #region Membres
         private string m_nom;
@@ -282,7 +268,7 @@ namespace DepotSiteInternet
         #endregion
 
         #region Ctor
-        public ProfesseurInternetDTO(string p_nom, string p_prenom)
+        public Professeur(string p_nom, string p_prenom)
         {
             if (String.IsNullOrWhiteSpace(p_nom))
             {
@@ -328,13 +314,9 @@ namespace DepotSiteInternet
         #endregion
 
         #region Methodes
-        public Professeur VersEntite()
-        {
-            return new Professeur(this.m_nom, this.m_prenom);
-        }
         public override bool Equals(object? obj)
         {
-            return obj is ProfesseurInternetDTO professeur &&
+            return obj is Professeur professeur &&
                    Nom == professeur.Nom &&
                    Prenom == professeur.Prenom;
         }
