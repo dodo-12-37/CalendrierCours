@@ -70,7 +70,6 @@
 
         #endregion
     }
-
     public class Cours
     {
         #region Membres
@@ -176,7 +175,6 @@
         }
         #endregion
     }
-
     public class Seance
     {
         #region Membres
@@ -259,7 +257,6 @@
         }
         #endregion
     }
-
     public class Professeur
     {
         #region Membres

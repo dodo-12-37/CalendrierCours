@@ -9,7 +9,7 @@
 
     public interface IExportFichier
     {
-        void ExporterVersFichier(string p_chemin);
+        void ExporterVersFichier(List<Cours> p_cours, string p_chemin);
     }
 
     public interface IDepotCours

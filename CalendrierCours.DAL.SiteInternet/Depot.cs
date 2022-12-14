@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text.RegularExpressions;
 using CalendrierCours.Entites;
+using Microsoft.Extensions.Configuration;
 
 namespace CalendrierCours.DAL.SiteInternet
 {
@@ -10,22 +11,12 @@ namespace CalendrierCours.DAL.SiteInternet
         #region Membres
         private string m_urlSiteCsfoy;
         private string m_urlSiteCsfoyCohorte;
-
         #endregion
 
         #region Ctor
         public DepotSiteInternet()
         {
-            this.LireFichierConfig("../../../../DepotSiteInternet/bin/Debug/net6.0/depot.config");
-        }
-        public DepotSiteInternet(string p_fichier)
-        {
-            if (String.IsNullOrWhiteSpace(p_fichier))
-            {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide`", nameof(p_fichier));
-            }
-
-            this.LireFichierConfig(p_fichier);
+            this.LireFichierConfig();
         }
         #endregion
 
@@ -225,25 +216,18 @@ namespace CalendrierCours.DAL.SiteInternet
 
             return nvCours;
         }
-        private void LireFichierConfig(string p_fichier)
+        private void LireFichierConfig()
         {
-            if (!File.Exists(p_fichier))
-            {
-                throw new ArgumentException("Le fichier doit exister", nameof(p_fichier));
-            }
-
-            string contenu = "";
-
-            using (StreamReader sr = new StreamReader(p_fichier))
-            {
-                contenu = sr.ReadToEnd();
-            }
-
             try
             {
-                string[] contenuLigne = contenu.Split("\r\n");
-                this.m_urlSiteCsfoy = contenuLigne[1].Split(",")[1];
-                this.m_urlSiteCsfoyCohorte = contenuLigne[2].Split(",")[1];
+                IConfigurationRoot configuration =
+                    new ConfigurationBuilder()
+                      .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
+                      .AddJsonFile("appsettings.json", false)
+                      .Build();
+                
+                this.m_urlSiteCsfoy = configuration["UrlSiteInternet"];
+                this.m_urlSiteCsfoyCohorte = configuration["UrlAvecCohorte"];
             }
             catch (Exception e)
             {

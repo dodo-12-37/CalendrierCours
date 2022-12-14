@@ -1,4 +1,6 @@
 ﻿using CalendrierCours.Entites;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace CalendrierCours.BL
 {
@@ -25,13 +27,70 @@ namespace CalendrierCours.BL
         #endregion
 
         #region Methodes
-        public void ExporterSeances(Cohorte p_cohorte, IExportFichier p_typeExport, DateTime? p_date = null)
+        public void ExporterSeances(Cohorte p_cohorte, IExportFichier p_typeExport, string p_chemin, DateTime? p_date = null)
         {
-            throw new NotImplementedException();
+            if (p_cohorte is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cohorte));
+            }
+            if (p_typeExport is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_typeExport));
+            }
+            if (String.IsNullOrWhiteSpace(p_chemin))
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_chemin));
+            }
+
+            this.MiseAJourCache(p_cohorte);
+
+            if (p_date is null)
+            {
+                p_date = DateTime.Now;
+            }
+
+            List<Cours> listeExport = this.ListerCours(p_cohorte)
+                .Select(c => new Cours(c.Enseignant, c.Intitule, c.Seances
+                    .Where(s => s.DateDebut >= p_date)
+                    .ToList()))
+                .ToList();
+
+            p_typeExport.ExporterVersFichier(listeExport, p_chemin);
         }
-        public void ExporterSeances(Cohorte p_cohorte, IExportFichier p_typeExport, Professeur p_professeur, DateTime? p_date = null)
+        public void ExporterSeances(Cohorte p_cohorte, IExportFichier p_typeExport, Professeur p_professeur, string p_chemin, DateTime? p_date = null)
         {
-            throw new NotImplementedException();
+            if (p_cohorte is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cohorte));
+            }
+            if (p_typeExport is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_typeExport));
+            }
+            if (p_professeur is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_professeur));
+            }
+            if (String.IsNullOrWhiteSpace(p_chemin))
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_chemin));
+            }
+
+            this.MiseAJourCache(p_cohorte);
+
+            if (p_date is null)
+            {
+                p_date = DateTime.Now;
+            }
+
+            List<Cours> listeExport = this.ListerCours(p_cohorte)
+                .Where(c => c.Enseignant.Equals(p_professeur))
+                .Select(c => new Cours(c.Enseignant, c.Intitule, c.Seances
+                    .Where(s => s.DateDebut >= p_date)
+                    .ToList()))
+                .ToList();
+
+            p_typeExport.ExporterVersFichier(listeExport, p_chemin);
         }
         public List<Cohorte> ListerCohorte()
         {
@@ -44,11 +103,7 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cohorte));
             }
 
-            if (!Cache.Cohorte.Equals(p_cohorte))
-            {
-                Cache.Cohorte = p_cohorte;
-                Cache.Cours = this.m_depot.RecupererCours(p_cohorte);
-            }
+            this.MiseAJourCache(p_cohorte);
 
             return Cache.Cours;
         }
@@ -63,6 +118,8 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cours));
             }
 
+            this.MiseAJourCache(p_cohorte);
+
             List<Seance> seancesRetour = new List<Seance>();
             this.ListerCours(p_cohorte);
 
@@ -73,7 +130,7 @@ namespace CalendrierCours.BL
 
             return seancesRetour;
         }
-        public List<Seance> ListerSeances(Cohorte p_cohorte, Cours p_cours, DateTime p_date)
+        public List<Seance> ListerSeances(Cohorte p_cohorte, Cours p_cours, DateTime? p_date = null)
         {
             if (p_cohorte is null)
             {
@@ -84,11 +141,18 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cours));
             }
 
+            this.MiseAJourCache(p_cohorte);
+
+            if (p_date is null)
+            {
+                p_date = DateTime.Now;
+            }
+
             List<Seance> seancesRetour = this.ListerSeances(p_cohorte, p_cours);
 
             return seancesRetour.Where(s => s.DateDebut >= p_date).ToList();
         }
-        public List<Seance> ListerSeances(Cohorte p_cohorte, Professeur p_professeur, DateTime p_date)
+        public List<Seance> ListerSeances(Cohorte p_cohorte, Professeur p_professeur, DateTime? p_date = null)
         {
             if (p_cohorte is null)
             {
@@ -99,26 +163,104 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_professeur));
             }
 
-            List<Cours> cours = this.ListerCours(p_cohorte).Where(c => c.Enseignant.Equals(p_professeur)).ToList();
-            //List<Seance> seancesRetour = cours
-            //    .SelectMany(c => c.Seances
-            //        .Select(s => s.DateDebut >= p_date))
-            //    .ToList();
+            this.MiseAJourCache(p_cohorte);
+            
+            if (p_date is null)
+            {
+                p_date = DateTime.Now;
+            }
 
-            throw new NotImplementedException();
+            List<Cours> cours = this.ListerCours(p_cohorte).Where(c => c.Enseignant.Equals(p_professeur)).ToList();
+            List<Seance> seancesRetour = cours
+                .SelectMany(c => c.Seances
+                    .Where(s => s.DateDebut >= p_date))
+                .ToList();
+
+            return seancesRetour;
         }
-        public void ModifierIntituleCours(string p_intitule)
+        public void ModifierIntituleCours(Cohorte p_cohorte, Cours p_cours, string p_intitule)
         {
-            throw new NotImplementedException();
+            if (p_cohorte is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cohorte));
+            }
+            if (p_cours is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cours));
+            }
+            if (String.IsNullOrWhiteSpace(p_intitule))
+            {
+                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_intitule));
+            }
+
+            this.MiseAJourCache(p_cohorte);
+
+            Cours coursAChanger = Cache.Cours.SingleOrDefault(c => c.Equals(p_cours));
+
+            if (coursAChanger is null)
+            {
+                throw new ArgumentException("Le cours ne fait pas partis de la cohorte", nameof(p_cours));
+            }
+            else
+            {
+                Regex regexNumeroCours = new Regex("(?<cours>[0-9]{3}-[A-Z]{1}[0-9]{2}-SF)");
+                string numeroCours = regexNumeroCours.Match(p_cours.Intitule).Groups["cours"].Value;
+
+                coursAChanger.Intitule = $"{numeroCours} {p_intitule}";
+            }
         }
-        public void ModifierNomProfesseur(string p_nom)
+        public void ModifierNomProfesseur(Cohorte p_cohorte, Professeur p_enseignant, string p_nom)
         {
-            throw new NotImplementedException();
+            if (p_cohorte is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cohorte));
+            }
+            if (p_enseignant is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_enseignant));
+            }
+            if (String.IsNullOrWhiteSpace(p_nom))
+            {
+                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_nom));
+            }
+
+            this.MiseAJourCache(p_cohorte);
+
+            Cache.Cours.Single(c => c.Enseignant.Equals(p_enseignant)).Enseignant.Nom = p_nom;
         }
-        public void ModifierPrenomProfesseur(string p_prenom)
+        public void ModifierPrenomProfesseur(Cohorte p_cohorte, Professeur p_enseignant, string p_prenom)
         {
-            throw new NotImplementedException();
+            if (p_cohorte is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cohorte));
+            }
+            if (p_enseignant is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_enseignant));
+            }
+            if (String.IsNullOrWhiteSpace(p_prenom))
+            {
+                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_prenom));
+            }
+
+            this.MiseAJourCache(p_cohorte);
+
+            Cache.Cours.Single(c => c.Enseignant.Equals(p_enseignant)).Enseignant.Prenom = p_prenom;
         }
+        private void MiseAJourCache(Cohorte p_cohorte)
+        {
+            if (p_cohorte is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cohorte));
+            }
+
+            if (!Cache.Cohorte.Equals(p_cohorte))
+            {
+                Cache.Cohorte = p_cohorte;
+                Cache.Cours = this.m_depot.RecupererCours(p_cohorte);
+            }
+        }
+
         #endregion
     }
 }
