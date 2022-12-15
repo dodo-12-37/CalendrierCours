@@ -196,17 +196,29 @@ namespace CalendrierCours.DAL.SiteInternet
         private CoursInternetDTO TransformerLigneNouvelleSeance(string p_ligne, DateTime p_dateDebut, DateTime p_dateFin)
         {
             Regex regexSeance = new Regex("(?<infos>[A-Z]{1}.+)");
-            Regex regexNumeroCours = new Regex("(?<cours>[0-9]{3}-[A-Z]{1}[0-9]{2}-SF)");
+            Regex regexNumeroCours = new Regex("(?<cours>[0-9]{3}-[A-Z0-9]{3}-SF)");
             int positionIntitule = 0, positionNumero = 1, positionProf = 2, positionSalle = 3;
             int PositionNomProf = 0, positionPrenomProf = 1;
 
             string info = regexSeance.Match(p_ligne).Groups["infos"].Value;
             string[] infos = info.Split("<br>");
             infos[positionSalle] = infos[positionSalle].Replace("</td></tr>", "");
+
             string nomCours = regexNumeroCours.Match(infos[positionNumero]).Groups["cours"].Value + " - " + infos[positionIntitule];
+
             string[] professeur = infos[positionProf].Split(", ");
 
-            ProfesseurInternetDTO nvProf = new ProfesseurInternetDTO(professeur[PositionNomProf], professeur[positionPrenomProf]);
+            ProfesseurInternetDTO nvProf = null;
+
+            if (professeur.Length == 2)
+            {
+                nvProf = new ProfesseurInternetDTO(professeur[PositionNomProf], professeur[positionPrenomProf]);
+            }
+            else
+            {
+                nvProf = new ProfesseurInternetDTO("-", "-");
+            }
+
             CoursInternetDTO nvCours = new CoursInternetDTO(nvProf, nomCours);
             SeanceInternetDTO nvSeance = new SeanceInternetDTO(p_dateDebut, p_dateFin, infos[positionSalle]);
             nvCours.Seances.Add(nvSeance);
@@ -222,7 +234,7 @@ namespace CalendrierCours.DAL.SiteInternet
                       .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
                       .AddJsonFile("appsettings.json", false)
                       .Build();
-                
+
                 this.m_urlSiteCsfoy = configuration["UrlSiteInternet"];
                 this.m_urlSiteCsfoyCohorte = configuration["UrlAvecCohorte"];
             }

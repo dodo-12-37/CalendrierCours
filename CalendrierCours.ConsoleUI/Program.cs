@@ -3,6 +3,7 @@ using CalendrierCours.ConsoleUI;
 using CalendrierCours.DAL.SiteInternet;
 using CalendrierCours.Entites;
 using System.ComponentModel;
+using System.Net;
 using System.Reflection;
 
 public class Program
@@ -11,21 +12,38 @@ public class Program
     {
         UtilitaireDepotCours utilitaireDepot = new UtilitaireDepotCours();
         UtilitaireExportCours utilitaireExport = new UtilitaireExportCours();
- 
+
+        Application application = null;
+        bool estInitialise = false;
+
         try
         {
+            Console.Out.WriteLine("Initialisation du dépot...");
             DepotSiteInternet depot = utilitaireDepot.CreerDepot() as DepotSiteInternet;
+            Console.Out.WriteLine("Initialisation du traitement...");
             Traitement traitement = new Traitement(depot);
-            Application application = new Application(traitement);
-            application.Run();
+            Console.Out.WriteLine("Initialisation de l'application...");
+            application = new Application(traitement);
+            Console.Out.WriteLine("Initialisation terminée avec succès !");
+            estInitialise = true;
+        }
+        catch (WebException)
+        {
+            Console.Error.WriteLine("Erreur de connexion internet !");
         }
         catch (InvalidDepotException)
         {
             Console.Error.WriteLine("Erreur du fichier de configuration du dépot !");
         }
-        catch(Exception) 
+        catch (Exception)
         {
             Console.Error.WriteLine("Erreur dans l'initialisation du programme !");
+        }
+
+        if (estInitialise)
+        {
+            Console.Clear();
+            application.Run();
         }
     }
 

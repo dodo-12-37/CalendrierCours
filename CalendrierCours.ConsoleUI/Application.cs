@@ -34,6 +34,8 @@ namespace CalendrierCours.ConsoleUI
         #region Methodes
         public void Run()
         {
+            this.InitialisationAffichage();
+
             this.AfficherCohorte();
 
             int choix = this.RetournerChoixUtilisateur($"Quelle cohorte ? (0/{this.m_cohortes.Count})", 0, m_cohortes.Count);
@@ -62,6 +64,12 @@ namespace CalendrierCours.ConsoleUI
         {
 
         }
+
+        private void InitialisationAffichage()
+        {
+
+        }
+
         private void MiseAJourCohorteEtCoursActifs(CohorteViewModelConsole p_cohorte)
         {
             if (p_cohorte is null)
@@ -88,13 +96,34 @@ namespace CalendrierCours.ConsoleUI
         private int RetournerChoixUtilisateur(string p_message, int? p_min = null, int? p_max = null)
         {
             int retour;
+            string choix = "";
             bool estValide = false;
 
             do
             {
-                Console.WriteLine(p_message);
+                Console.WriteLine(p_message + " Appuyez sur 'Entrer' pour valider...");
+                ConsoleKeyInfo keyInfo;
+                do
+                {
+                    keyInfo = Console.ReadKey(true);
+                    char saisie = keyInfo.KeyChar;
 
-                estValide = int.TryParse(Console.ReadLine(), out retour);
+                    if (saisie >= '0' && saisie <= '9')
+                    {
+                        choix += saisie;
+                        Console.Write(saisie);
+                    }
+                    else if (keyInfo.Key == ConsoleKey.Backspace && Console.CursorLeft > 0 && choix.Length > 0)
+                    {
+                        Console.SetCursorPosition(0, Console.CursorTop);
+                        Console.Write(new String(' ', Console.BufferWidth));
+                        choix = choix.Remove(choix.Length - 1, 1);
+                        Console.SetCursorPosition(0, Console.CursorTop);
+                        Console.Write(choix);
+                    }
+                } while (keyInfo.Key != ConsoleKey.Enter);
+
+                estValide = int.TryParse(choix, out retour);
 
                 if (estValide && p_min is not null)
                 {
@@ -106,7 +135,7 @@ namespace CalendrierCours.ConsoleUI
                 }
                 if (!estValide)
                 {
-                    Console.Out.WriteLine("Saisie incorrecte !");
+                    Console.Out.WriteLine("\nSaisie incorrecte !");
                 }
             } while (!estValide);
 
