@@ -11,25 +11,27 @@ public class Program
     {
         UtilitaireDepotCours utilitaireDepot = new UtilitaireDepotCours();
         UtilitaireExportCours utilitaireExport = new UtilitaireExportCours();
-        DepotSiteInternet depot = utilitaireDepot.CreerDepot() as DepotSiteInternet;
-
-        Traitement traitement = new Traitement(depot);
-
-        List<CohorteViewModelConsole> cohortes = traitement.ListerCohorte()
-            .Select(c => new CohorteViewModelConsole(c))
-            .ToList();
-
-        cohortes.ForEach(cvm => Console.WriteLine(cvm.ToString()));
-
-        List<CoursViewModelConsole> cours = depot.RecupererCours(cohortes[25].VersEntite())
-            .Select(c => new CoursViewModelConsole(c))
-            .ToList();
-
-        cours.ForEach(cvm => Console.WriteLine(cvm.ToString()));
+ 
+        try
+        {
+            DepotSiteInternet depot = utilitaireDepot.CreerDepot() as DepotSiteInternet;
+            Traitement traitement = new Traitement(depot);
+            Application application = new Application(traitement);
+            application.Run();
+        }
+        catch (InvalidDepotException)
+        {
+            Console.Error.WriteLine("Erreur du fichier de configuration du dépot !");
+        }
+        catch(Exception) 
+        {
+            Console.Error.WriteLine("Erreur dans l'initialisation du programme !");
+        }
     }
+
 }
 
-public class UtilitaireDepotCours 
+public class UtilitaireDepotCours
 {
     public static IEnumerable<CreateurDepot> RechercherDepotCours()
     {
@@ -61,7 +63,7 @@ public class CreateurDepot
         return (IDepotCours)Activator.CreateInstance(this.Type);
     }
 }
-public class UtilitaireExportCours 
+public class UtilitaireExportCours
 {
     public static IEnumerable<CreateurExport> RechercherDepotCours()
     {

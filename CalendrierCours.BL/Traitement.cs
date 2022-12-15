@@ -1,4 +1,5 @@
 ﻿using CalendrierCours.Entites;
+using System.Net;
 using System.Text.RegularExpressions;
 
 namespace CalendrierCours.BL
@@ -93,7 +94,18 @@ namespace CalendrierCours.BL
         }
         public List<Cohorte> ListerCohorte()
         {
-            return this.m_depot.RecupererCohortes();
+            List<Cohorte> listeCohortes = new List<Cohorte>();
+
+            try
+            {
+                listeCohortes = this.m_depot.RecupererCohortes();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return listeCohortes;
         }
         public List<Cours> ListerCours(Cohorte p_cohorte)
         {
@@ -163,7 +175,7 @@ namespace CalendrierCours.BL
             }
 
             this.MiseAJourCache(p_cohorte);
-            
+
             if (p_date is null)
             {
                 p_date = DateTime.Now;
@@ -253,10 +265,17 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cohorte));
             }
 
-            if (!Cache.Cohorte.Equals(p_cohorte))
+            if (Cache.Cohorte is null || !Cache.Cohorte.Equals(p_cohorte))
             {
                 Cache.Cohorte = p_cohorte;
-                Cache.Cohorte.Cours = this.m_depot.RecupererCours(p_cohorte);
+                try
+                {
+                    Cache.Cohorte.Cours = this.m_depot.RecupererCours(p_cohorte);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
         }
         #endregion
