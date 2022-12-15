@@ -217,7 +217,7 @@ namespace CalendrierCours.BL
                 Regex regexNumeroCours = new Regex("(?<cours>[0-9]{3}-[A-Z]{1}[0-9]{2}-SF)");
                 string numeroCours = regexNumeroCours.Match(p_cours.Intitule).Groups["cours"].Value;
 
-                coursAChanger.Intitule = $"{numeroCours} {p_intitule}";
+                coursAChanger.Intitule = $"{numeroCours} - {p_intitule}";
             }
         }
         public void ModifierNomProfesseur(Cohorte p_cohorte, Professeur p_enseignant, string p_nom)
@@ -237,7 +237,9 @@ namespace CalendrierCours.BL
 
             this.MiseAJourCache(p_cohorte);
 
-            Cache.Cohorte.Cours.Single(c => c.Enseignant.Equals(p_enseignant)).Enseignant.Nom = p_nom;
+            List<Cours> cours = Cache.Cohorte.Cours.Where(c => c.Enseignant.Equals(p_enseignant)).ToList();
+
+            cours.ForEach(c => c.Enseignant.Nom = p_nom);
         }
         public void ModifierPrenomProfesseur(Cohorte p_cohorte, Professeur p_enseignant, string p_prenom)
         {
@@ -256,7 +258,9 @@ namespace CalendrierCours.BL
 
             this.MiseAJourCache(p_cohorte);
 
-            Cache.Cohorte.Cours.Single(c => c.Enseignant.Equals(p_enseignant)).Enseignant.Prenom = p_prenom;
+            List<Cours> cours = Cache.Cohorte.Cours.Where(c => c.Enseignant.Equals(p_enseignant)).ToList();
+
+            cours.ForEach(c => c.Enseignant.Prenom = p_prenom);
         }
         private void MiseAJourCache(Cohorte p_cohorte)
         {

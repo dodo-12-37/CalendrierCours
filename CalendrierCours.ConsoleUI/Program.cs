@@ -42,7 +42,6 @@ public class Program
 
         if (estInitialise)
         {
-            Console.Clear();
             application.Run();
         }
     }
