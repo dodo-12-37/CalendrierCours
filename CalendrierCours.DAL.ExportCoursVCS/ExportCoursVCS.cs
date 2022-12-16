@@ -24,13 +24,13 @@ namespace CalendrierCours.DAL.ExportCoursVCS
             string contenu = "";
             coursEport.ForEach(c => c.Seances.ForEach(s => contenu += this.EcrireSeance(c, s)));
 
-            this.EcrireFichier(p_chemin, contenu);
+            this.EcrireFichier(fichier, contenu);
         }
 
         private string RetournerNomFichier(string p_chemin)
         {
             bool estDisponible = true;
-            string fichier = p_chemin + "/cours.vcs";
+            string fichier = p_chemin + "\\cours.vcs";
 
             do
             {
@@ -41,7 +41,7 @@ namespace CalendrierCours.DAL.ExportCoursVCS
                 }
                 else
                 {
-                    fichier = p_chemin + compteur + "/cours.vcs";
+                    fichier = p_chemin + "\\cours" + compteur + ".vcs";
                     compteur++;
                 }
 
@@ -52,8 +52,8 @@ namespace CalendrierCours.DAL.ExportCoursVCS
 
         private string EcrireSeance(CoursVCSDTO p_cours, SeanceVCSDTO p_seance)
         {
-            DateTime dateDebut = p_seance.DateDebut.AddHours(-5);
-            DateTime dateFin = p_seance.DateFin.AddHours(-5);
+            DateTime dateDebut = p_seance.DateDebut.AddHours(5);
+            DateTime dateFin = p_seance.DateFin.AddHours(5);
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("BEGIN:VCALENDAR");
@@ -75,10 +75,8 @@ namespace CalendrierCours.DAL.ExportCoursVCS
         }
         private void EcrireFichier(string p_fichier, string p_contenu)
         {
-            using (FileStream fs = new FileStream(p_fichier, FileMode.Create))
-            {
-                fs.Dispose();
-            }
+            FileStream fs = new FileStream(p_fichier, FileMode.Create);
+            fs.Dispose();
 
             using (StreamWriter sw = new StreamWriter(p_fichier))
             {
