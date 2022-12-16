@@ -596,10 +596,11 @@ namespace CalendrierCours.ConsoleUI
                     }
                     else if (keyInfo.Key == ConsoleKey.Backspace && Console.CursorLeft > 0 && retour.Length > 0)
                     {
-                        Console.SetCursorPosition(0, Console.CursorTop);
+                        int positionCurseurTop = Console.CursorTop;
+                        Console.SetCursorPosition(0, positionCurseurTop);
                         Console.Write(new String(' ', Console.BufferWidth));
                         retour = retour.Remove(retour.Length - 1, 1);
-                        Console.SetCursorPosition(0, Console.CursorTop);
+                        Console.SetCursorPosition(0, positionCurseurTop);
                         Console.Write(retour);
                     }
                     else if (keyInfo.Key != ConsoleKey.Enter)
