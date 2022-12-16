@@ -1,108 +1,20 @@
 ﻿using CalendrierCours.Entites;
-using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace CalendrierCours.ConsoleUI
+namespace CalendrierCours.DAL.ExportCoursVCS
 {
-    public class CohorteViewModelConsole
+    public class CoursVCSDTO
     {
         #region Membres
-        private List<CoursViewModelConsole> m_listeCours;
-        private string m_numero;
-        #endregion
-
-        #region Ctor
-        public CohorteViewModelConsole(string p_numero)
-        {
-            if (String.IsNullOrWhiteSpace(p_numero))
-            {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
-            }
-
-            this.Numero = p_numero;
-            this.m_listeCours = new List<CoursViewModelConsole>();
-        }
-        public CohorteViewModelConsole(List<CoursViewModelConsole> p_listeCours, string p_numero)
-        {
-            if (p_listeCours is null)
-            {
-                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_listeCours));
-            }
-            if (String.IsNullOrWhiteSpace(p_numero))
-            {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
-            }
-
-            this.m_listeCours = p_listeCours;
-            this.m_numero = p_numero;
-        }
-        public CohorteViewModelConsole(Cohorte p_cohorte) 
-            : this(p_cohorte.Cours.Select(c => new CoursViewModelConsole(c)).ToList(), p_cohorte.Numero)
-        { }
-        #endregion
-
-        #region Proprietes
-        public List<CoursViewModelConsole> ListeCours
-        {
-            get
-            {
-                return this.m_listeCours;
-            }
-            set
-            {
-                if (value is null)
-                {
-                    throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
-                }
-                this.m_listeCours = value;
-            }
-        }
-        public string Numero
-        {
-            get { return this.m_numero; }
-            set
-            {
-                if (String.IsNullOrWhiteSpace(value))
-                {
-                    throw new ArgumentNullException("Ne doit pas etre null ou vide");
-                }
-                this.m_numero = value;
-            }
-        }
-        #endregion
-
-        #region Methodes
-        public Cohorte VersEntite()
-        {
-            List<Cours> listeCours = this.m_listeCours.Select(cDTo => cDTo.VersEntites()).ToList();
-
-            return new Cohorte(listeCours, this.Numero);
-        }
-        public override string ToString()
-        {
-            int positionPeriode = 1, positionNumero = 2;
-            string[] elementsCohorte = this.m_numero.Split('_');
-
-            return $"Cohorte n° {elementsCohorte[positionNumero]} - période : {elementsCohorte[positionPeriode]}";
-        }
-        public override bool Equals(object? obj)
-        {
-            return obj is CohorteViewModelConsole cohorte
-                && cohorte.Numero == this.m_numero;
-        }
-        #endregion
-    }
-    public class CoursViewModelConsole
-    {
-        #region Membres
-        private ProfesseurViewModelConsole m_enseignant;
         private string m_intitule;
-        private List<SeanceViewModelConsole> m_seances;
+        private string m_numero;
+        private ProfesseurVCSDTO m_enseignant;
+        private List<SeanceVCSDTO> m_seances;
         #endregion
 
         #region Ctor
-        public CoursViewModelConsole(ProfesseurViewModelConsole p_enseignant, string p_intitule)
+        public CoursVCSDTO(ProfesseurVCSDTO p_enseignant, string p_intitule)
         {
             if (p_enseignant is null)
             {
@@ -115,9 +27,9 @@ namespace CalendrierCours.ConsoleUI
 
             this.m_enseignant = p_enseignant;
             this.m_intitule = p_intitule;
-            this.m_seances = new List<SeanceViewModelConsole>();
+            this.m_seances = new List<SeanceVCSDTO>();
         }
-        public CoursViewModelConsole(ProfesseurViewModelConsole p_enseignant, string p_intitule, List<SeanceViewModelConsole> p_seances)
+        public CoursVCSDTO(ProfesseurVCSDTO p_enseignant, string p_intitule, List<SeanceVCSDTO> p_seances)
         {
             if (p_enseignant is null)
             {
@@ -132,17 +44,29 @@ namespace CalendrierCours.ConsoleUI
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_seances));
             }
 
+            Regex regexNumeroCours = new Regex("(?<cours>[0-9]{3}-[A-Z]{1}[0-9]{2}-SF)");
+
+            string numeroCours = "";
+
+            if (regexNumeroCours.IsMatch(p_intitule))
+            {
+                numeroCours = regexNumeroCours.Match(p_intitule).Groups["cours"].Value;
+            }
+
+            string intituleCours = p_intitule.Replace(numeroCours + " - ", string.Empty);
+
+            this.m_intitule = intituleCours;
+            this.m_numero = numeroCours;
             this.m_enseignant = p_enseignant;
-            this.m_intitule = p_intitule;
             this.m_seances = p_seances;
         }
-        public CoursViewModelConsole(Cours p_cours) 
-            : this(new ProfesseurViewModelConsole(p_cours.Enseignant), p_cours.Intitule, p_cours.Seances.Select(s => new SeanceViewModelConsole(s)).ToList()) 
+        public CoursVCSDTO(Cours p_cours)
+            : this(new ProfesseurVCSDTO(p_cours.Enseignant), p_cours.Intitule, p_cours.Seances.Select(s => new SeanceVCSDTO(s)).ToList())
         { }
         #endregion
 
         #region Proprietes
-        public ProfesseurViewModelConsole Enseignant
+        public ProfesseurVCSDTO Enseignant
         {
             get { return this.m_enseignant; }
             set
@@ -168,7 +92,20 @@ namespace CalendrierCours.ConsoleUI
                 this.m_intitule = value;
             }
         }
-        public List<SeanceViewModelConsole> Seances
+        public string Numero
+        {
+            get { return this.m_numero; }
+            set
+            {
+                if (String.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                }
+
+                this.m_intitule = value;
+            }
+        }
+        public List<SeanceVCSDTO> Seances
         {
             get
             {
@@ -193,25 +130,9 @@ namespace CalendrierCours.ConsoleUI
 
             return new Cours(this.m_enseignant.VersEntite(), this.m_intitule, Seances);
         }
-        public override string ToString()
-        {
-            Regex regexNumeroCours = new Regex("(?<cours>[0-9]{3}-[A-Z]{1}[0-9]{2}-SF)");
-
-            string numeroCours = regexNumeroCours.Match(this.m_intitule).Groups["cours"].Value;
-            string intituleCours = this.m_intitule.Replace(numeroCours + " - ", string.Empty);
-
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append($"Cours n° {numeroCours} - {intituleCours} ");
-            sb.Append($"donné par {this.Enseignant.ToString()} ");
-            sb.AppendLine($"- Nombre de séances : {this.Seances.Count}");
-            this.m_seances.ForEach(s => sb.AppendLine($"\t{s.ToString()}"));
-
-            return sb.ToString();
-        }
         public override bool Equals(object? obj)
         {
-            return obj is CoursViewModelConsole cours
+            return obj is CoursVCSDTO cours
                 && this.Enseignant.Equals(cours.Enseignant)
                 && Intitule == cours.Intitule;
         }
@@ -221,7 +142,7 @@ namespace CalendrierCours.ConsoleUI
         }
         #endregion
     }
-    public class SeanceViewModelConsole
+    public class SeanceVCSDTO
     {
         #region Membres
         private DateTime m_dateDebut;
@@ -230,7 +151,7 @@ namespace CalendrierCours.ConsoleUI
         #endregion
 
         #region Ctor
-        public SeanceViewModelConsole(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
+        public SeanceVCSDTO(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
         {
             if (p_dateDebut >= p_dateFin)
             {
@@ -245,7 +166,7 @@ namespace CalendrierCours.ConsoleUI
             this.m_dateFin = p_dateFin;
             this.m_salle = p_salle;
         }
-        public SeanceViewModelConsole(Seance p_seance) : this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle) { }
+        public SeanceVCSDTO(Seance p_seance) : this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle) { }
         #endregion
 
         #region Proprietes
@@ -295,20 +216,9 @@ namespace CalendrierCours.ConsoleUI
         {
             return new Seance(this.m_dateDebut, this.m_dateFin, this.m_salle);
         }
-        public override string ToString()
-        {
-            CultureInfo cultureInfo= CultureInfo.CreateSpecificCulture("fr-CA");
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append($"Le {this.m_dateDebut.ToString("dddd dd MMMM yyyy", cultureInfo)} ");
-            sb.Append($"de {this.m_dateDebut.ToString("HH:mm", cultureInfo)}" );
-            sb.Append($" à {this.m_dateFin.ToString("HH:mm", cultureInfo)}" );
-
-            return sb.ToString();
-        }
         public override bool Equals(object? obj)
         {
-            return obj is SeanceViewModelConsole seance
+            return obj is SeanceVCSDTO seance
                 && seance.DateDebut == this.DateDebut
                 && seance.DateFin == this.DateFin
                 && seance.Salle == this.Salle;
@@ -319,7 +229,7 @@ namespace CalendrierCours.ConsoleUI
         }
         #endregion
     }
-    public class ProfesseurViewModelConsole
+    public class ProfesseurVCSDTO
     {
         #region Membres
         private string m_nom;
@@ -327,7 +237,7 @@ namespace CalendrierCours.ConsoleUI
         #endregion
 
         #region Ctor
-        public ProfesseurViewModelConsole(string p_nom, string p_prenom)
+        public ProfesseurVCSDTO(string p_nom, string p_prenom)
         {
             if (String.IsNullOrWhiteSpace(p_nom))
             {
@@ -341,7 +251,7 @@ namespace CalendrierCours.ConsoleUI
             this.m_nom = p_nom;
             this.m_prenom = p_prenom;
         }
-        public ProfesseurViewModelConsole(Professeur p_enseignant) : this(p_enseignant.Nom, p_enseignant.Prenom) { }
+        public ProfesseurVCSDTO(Professeur p_enseigant) : this(p_enseigant.Nom, p_enseigant.Prenom) { }
         #endregion
 
         #region Proprietes
@@ -378,13 +288,9 @@ namespace CalendrierCours.ConsoleUI
         {
             return new Professeur(this.m_nom, this.m_prenom);
         }
-        public override string ToString()
-        {
-            return $"{this.m_prenom} {this.m_nom}";
-        }
         public override bool Equals(object? obj)
         {
-            return obj is ProfesseurViewModelConsole professeur &&
+            return obj is ProfesseurVCSDTO professeur &&
                    Nom == professeur.Nom &&
                    Prenom == professeur.Prenom;
         }
@@ -394,5 +300,4 @@ namespace CalendrierCours.ConsoleUI
         }
         #endregion
     }
-
 }

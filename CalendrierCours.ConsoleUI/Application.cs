@@ -1,6 +1,9 @@
 ﻿using CalendrierCours.BL;
+using CalendrierCours.DAL.ExportCoursVCS;
 using CalendrierCours.Entites;
 using System;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace CalendrierCours.ConsoleUI
 {
@@ -64,7 +67,7 @@ namespace CalendrierCours.ConsoleUI
                         this.ChoisirCohorte();
                         break;
                     case 2:
-                        this.AfficherCours();
+                        this.AfficherCoursComplets();
                         break;
                     case 3:
                         this.ModifierCours();
@@ -81,14 +84,6 @@ namespace CalendrierCours.ConsoleUI
                     default:
                         break;
                 }
-
-
-
-
-
-
-
-
 
             } while (choix != 0);
 
@@ -128,7 +123,7 @@ namespace CalendrierCours.ConsoleUI
             int compteur = 1;
             this.m_cohortes.ForEach(cvm => Console.WriteLine($"{compteur++} - {cvm.ToString()}"));
         }
-        private void AfficherCours()
+        private void AfficherCoursComplets()
         {
             Console.Clear();
 
@@ -139,6 +134,25 @@ namespace CalendrierCours.ConsoleUI
                 Console.WriteLine("Appuyez sur une touche pour continuer...");
                 Console.ReadLine();
             }
+        }
+        private void AfficherListeCoursAvecCompteur(List<CoursViewModelConsole>? p_cours = null)
+        {
+            int compteur = 1;
+
+            if (p_cours is null)
+            {
+                this.m_cohorteActive.ListeCours
+                    .ForEach(cvm => Console.WriteLine($"{compteur++} - {cvm.Intitule}"));
+            }
+            else
+            {
+                p_cours.ForEach(cvm => Console.WriteLine($"{compteur++} - {cvm.Intitule}"));
+            }
+        }
+        private void AfficherMessageSortieMethode()
+        {
+            Console.WriteLine("Appuyez sur une touche pour continuer...");
+            Console.ReadLine();
         }
 
         private void ChoisirCohorte()
@@ -155,14 +169,16 @@ namespace CalendrierCours.ConsoleUI
                     Console.WriteLine("\nRécupération de la cohorte...");
                     this.MiseAJourCohorteActiveDepuisDepot(this.m_cohortes[choix - 1]);
                     Console.WriteLine("Récupération réussie !");
-                    Console.WriteLine("Appuyez sur une touche pour continuer...");
-                    Console.ReadLine();
                 }
                 catch (Exception)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Error.WriteLine("Erreur lors de la récupération de la cohorte.");
                     Console.ForegroundColor = ConsoleColor.Black;
+                }
+                finally
+                {
+                    this.AfficherMessageSortieMethode();
                 }
             }
 
@@ -173,11 +189,10 @@ namespace CalendrierCours.ConsoleUI
 
             if (this.VerifierCohorteActive())
             {
-                int choix, compteur = 1;
+                int choix;
                 Console.WriteLine($"Cours présents dans la cohorte {this.m_cohorteActive.ToString()} :");
 
-                this.m_cohorteActive.ListeCours
-                    .ForEach(cvm => Console.WriteLine($"{compteur++} - {cvm.Intitule}"));
+                this.AfficherListeCoursAvecCompteur();
 
                 choix = this.RetournerChoixUtilisateur("Quel intitulé de cours voulez-vous modifier ?", 1, this.m_cohorteActive.ListeCours.Count);
 
@@ -185,19 +200,21 @@ namespace CalendrierCours.ConsoleUI
                 {
                     CoursViewModelConsole coursAModifier = this.m_cohorteActive.ListeCours[choix - 1];
                     Console.WriteLine($"\nChangement de l'intitulé du cours {coursAModifier.Intitule}");
-                    string nvIntilute = this.RetournerSaisieUtilisateur("Quel est le nouvel intitulé ?");
+                    string? nvIntilute = this.RetournerSaisieUtilisateur("Quel est le nouvel intitulé ?");
 
-                    Console.WriteLine("Modifications en cours...");
-                    this.m_traitement.ModifierIntituleCours(this.m_cohorteActive.VersEntite(), coursAModifier.VersEntites(), nvIntilute);
-                    bool estReussi = this.MiseAJoursCohorteActiveDepuisTraitement();
-
-                    if (estReussi)
+                    if (nvIntilute is not null)
                     {
-                        Console.WriteLine("Modifications effectuées !");
-                    }
+                        Console.WriteLine("Modifications en cours...");
+                        this.m_traitement.ModifierIntituleCours(this.m_cohorteActive.VersEntite(), coursAModifier.VersEntites(), nvIntilute);
+                        bool estReussi = this.MiseAJoursCohorteActiveDepuisTraitement();
 
-                    Console.WriteLine("Appuyez sur une toucher pour continuer...");
-                    Console.ReadLine();
+                        if (estReussi)
+                        {
+                            Console.WriteLine("Modifications effectuées !");
+                        }
+
+                        this.AfficherMessageSortieMethode();
+                    }
                 }
             }
         }
@@ -228,33 +245,38 @@ namespace CalendrierCours.ConsoleUI
 
                     if (choix != -1)
                     {
-                        string modification = "";
-                        bool estReussi;
+                        string? modification;
+                        bool estReussi = false;
 
                         if (choix == 1)
                         {
                             modification = this.RetournerSaisieUtilisateur("\nQuel est le nouveau nom ?");
 
-                            Console.WriteLine("Modification en cours...");
-                            this.m_traitement.ModifierNomProfesseur(this.m_cohorteActive.VersEntite(), profAModifier.VersEntite(), modification);
-                            estReussi = this.MiseAJoursCohorteActiveDepuisTraitement();
+                            if (modification is not null)
+                            {
+                                Console.WriteLine("Modification en cours...");
+                                this.m_traitement.ModifierNomProfesseur(this.m_cohorteActive.VersEntite(), profAModifier.VersEntite(), modification);
+                                estReussi = this.MiseAJoursCohorteActiveDepuisTraitement();
+                            }
                         }
                         else
                         {
                             modification = this.RetournerSaisieUtilisateur("\nQuel est le nouveau prénom ?");
 
-                            Console.WriteLine("Modification en cours...");
-                            this.m_traitement.ModifierPrenomProfesseur(this.m_cohorteActive.VersEntite(), profAModifier.VersEntite(), modification);
-                            estReussi = this.MiseAJoursCohorteActiveDepuisTraitement();
+                            if (modification is not null)
+                            {
+                                Console.WriteLine("Modification en cours...");
+                                this.m_traitement.ModifierPrenomProfesseur(this.m_cohorteActive.VersEntite(), profAModifier.VersEntite(), modification);
+                                estReussi = this.MiseAJoursCohorteActiveDepuisTraitement();
+                            }
                         }
 
                         if (estReussi)
                         {
                             Console.WriteLine("Modifications effectuées !");
+                            this.AfficherMessageSortieMethode();
                         }
 
-                        Console.WriteLine("Appuyez sur une toucher pour continuer...");
-                        Console.ReadLine();
                     }
                 }
             }
@@ -267,26 +289,117 @@ namespace CalendrierCours.ConsoleUI
             if (this.VerifierCohorteActive())
             {
                 int choix;
+                List<CoursViewModelConsole>? coursAExporter = null;
                 Console.WriteLine($"Exportation des cours de la cohorte {this.m_cohorteActive.ToString()}");
 
-                choix = this.RetournerChoixUtilisateur("Dans quel format voulez-vous exporter ?", this.m_menuExportCours.Keys.ToList());
+                choix = this.RetournerChoixUtilisateur("Voulez-vous exporter tous les cours ?\n1 - oui\n2 - non\n", 1, 2);
 
                 if (choix != -1)
                 {
-                    
-                    string chemin = this.RetournerSaisieUtilisateur("À quel endroit voulez-vous enregistrez le fichier ?");
-                    
-                   
-
                     if (choix == 1)
                     {
-                        Console.WriteLine("Exportation en cours...");
+                        coursAExporter = this.m_cohorteActive.ListeCours;
+                    }
+                    else
+                    {
+                        coursAExporter = this.RecupererCoursAExporter();
                     }
 
-                    Console.WriteLine("Appuyez sur une toucher pour continuer...");
-                    Console.ReadLine();
+                    if (coursAExporter is not null)
+                    {
+                        Console.WriteLine();
+                        this.AfficherMenu(this.m_menuExportCours);
+                        choix = this.RetournerChoixUtilisateur("Dans quel format voulez-vous exporter ?", this.m_menuExportCours.Keys.ToList());
+
+                        if (choix != -1)
+                        {
+                            IExportFichier exportFichier = this.RecupererObjetExport(choix - 1);
+
+                            Console.WriteLine();
+                            string? chemin = this.RecupererCheminExport();
+
+                            if (chemin is not null)
+                            {
+                                Console.WriteLine("Exportation en cours...");
+
+                                try
+                                {
+                                    exportFichier.ExporterVersFichier
+                                        (coursAExporter.Select(cvm => cvm.VersEntites()).ToList(), chemin);
+                                    Console.WriteLine("Exportation réussie !");
+                                }
+                                catch (Exception)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.Error.WriteLine("Erreur dans l'expotation des cours !");
+                                    Console.ForegroundColor = ConsoleColor.Black;
+                                }
+                                this.AfficherMessageSortieMethode();
+                            }
+                        }
+                    }
                 }
             }
+        }
+        private string? RecupererCheminExport()
+        {
+            bool estValide = false;
+            string? chemin = "";
+
+            return ".";
+
+            //do
+            //{
+            //    chemin = this.RetournerSaisieUtilisateur("À quel endroit voulez-vous enregistrez le fichier ?");
+
+            //    if (chemin is not null)
+            //    {
+            //        try
+            //        {
+            //            if (!Directory.Exists(chemin))
+            //            {
+            //                Directory.CreateDirectory(chemin);
+            //            }
+            //            estValide = true;
+            //        }
+            //        catch (Exception)
+            //        {
+            //            Console.ForegroundColor = ConsoleColor.Red;
+            //            Console.Error.WriteLine("Le chemin entré n'est pas correcte !");
+            //            Console.ForegroundColor = ConsoleColor.Black;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        estValide = true;
+            //    }
+            //} while (!estValide);
+
+            //return chemin;
+        }
+        private List<CoursViewModelConsole>? RecupererCoursAExporter()
+        {
+            List<CoursViewModelConsole> listeRetour = new List<CoursViewModelConsole>();
+            int choix;
+
+            Console.WriteLine();
+            this.AfficherListeCoursAvecCompteur();
+            choix = this.RetournerChoixUtilisateur("Quel cours voulez-vous exporter ?", 1, this.m_cohorteActive.ListeCours.Count);
+
+            if (choix != -1)
+            {
+                listeRetour.Add(this.m_cohorteActive.ListeCours[choix - 1]);
+            }
+            else
+            {
+                listeRetour = null;
+            }
+
+            return listeRetour;
+        }
+        private IExportFichier RecupererObjetExport(int p_index)
+        {
+            return new ExportCoursVCS();
         }
 
         private bool MiseAJoursCohorteActiveDepuisTraitement()
@@ -347,8 +460,7 @@ namespace CalendrierCours.ConsoleUI
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Error.WriteLine("Veuillez choisir une cohorte avant d'afficher les cours !");
                 Console.ForegroundColor = ConsoleColor.Black;
-                Console.WriteLine("Appuyez sur une touche pour continuer...");
-                Console.ReadLine();
+                this.AfficherMessageSortieMethode();
             }
 
             return !estNull;
@@ -462,17 +574,44 @@ namespace CalendrierCours.ConsoleUI
 
             return retour;
         }
-        private string RetournerSaisieUtilisateur(string p_message)
+        private string? RetournerSaisieUtilisateur(string p_message)
         {
             bool estValide = false;
-            string retour = "";
+            string? retour = "";
 
             do
             {
-                Console.WriteLine(p_message);
-                retour = Console.ReadLine().Trim();
+                Console.WriteLine(p_message + " Appuyez sur 'Entrer' pour valider, 'Echap' pour annuler...");
+                ConsoleKeyInfo keyInfo;
 
-                if (String.IsNullOrWhiteSpace(retour))
+                do
+                {
+                    keyInfo = Console.ReadKey(true);
+                    char saisie = keyInfo.KeyChar;
+
+                    if (keyInfo.Key == ConsoleKey.Escape)
+                    {
+                        retour = null;
+                        estValide = true;
+                    }
+                    else if (keyInfo.Key == ConsoleKey.Backspace && Console.CursorLeft > 0 && retour.Length > 0)
+                    {
+                        Console.SetCursorPosition(0, Console.CursorTop);
+                        Console.Write(new String(' ', Console.BufferWidth));
+                        retour = retour.Remove(retour.Length - 1, 1);
+                        Console.SetCursorPosition(0, Console.CursorTop);
+                        Console.Write(retour);
+                    }
+                    else if (keyInfo.Key != ConsoleKey.Enter)
+                    {
+                        retour += saisie;
+                        Console.Write(saisie);
+                    }
+
+                } while (keyInfo.Key != ConsoleKey.Enter && keyInfo.Key != ConsoleKey.Escape);
+
+
+                if (!estValide && String.IsNullOrWhiteSpace(retour))
                 {
                     estValide = false;
                 }
