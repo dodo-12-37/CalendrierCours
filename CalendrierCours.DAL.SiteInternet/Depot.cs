@@ -19,8 +19,8 @@ namespace CalendrierCours.DAL.SiteInternet
         {
             IConfigurationRoot configuration = this.LireFichierConfig();
 
-            this.m_urlSiteCsfoy = this.AffecterStringDepuisFichierConfig("urlSiteInternet");
-            this.m_urlSiteCsfoyCohorte = this.AffecterStringDepuisFichierConfig("urlAvecCohorte");
+            this.m_urlSiteCsfoy = this.AffecterParametreDepuisFichierConfig("urlSiteInternet");
+            this.m_urlSiteCsfoyCohorte = this.AffecterParametreDepuisFichierConfig("urlAvecCohorte");
         }
         #endregion
 
@@ -38,7 +38,7 @@ namespace CalendrierCours.DAL.SiteInternet
             List<Cohorte> listeRetour = new List<Cohorte>();
 
             listeRetour = lignesContenuInternet
-                .Where(str => str.Contains(this.AffecterStringDepuisFichierConfig("formatListeCohorte")))
+                .Where(str => str.Contains(this.AffecterParametreDepuisFichierConfig("formatListeCohorte")))
                 .Select(str =>
                 {
                     string[] valeurs = str.Split("\"");
@@ -117,15 +117,15 @@ namespace CalendrierCours.DAL.SiteInternet
 
             string gpHeure = "h", gpMinute = "m", gpSemaine = "s", gpTaille = "t";
             string configHeures = "formatHeures", configMinutes = "formatMinutes", configSemaines = "formatSemaine";
-            string configLigneCours = "formatLigneCours", configLigneVide = "formatLignevide", configHauteurCases = "formatHeuteurCase";
+            string configLigneCours = "formatLigneCours", configLigneVide = "formatLignevide", configHauteurCases = "formatHauteurCase";
 
             Regex formatHeures = 
-                new Regex($"(?<{gpHeure}>{this.AffecterStringDepuisFichierConfig(configHeures)})" +
-                $":(?<{gpMinute}>{this.AffecterStringDepuisFichierConfig(configMinutes)})");
-            Regex formatSemaines = new Regex($"(?<{gpSemaine}>{this.AffecterStringDepuisFichierConfig(configSemaines)})");
-            Regex formatLigneCours = new Regex(this.AffecterStringDepuisFichierConfig(configLigneCours));
-            Regex formatLigneVide = new Regex(this.AffecterStringDepuisFichierConfig(configLigneVide));
-            Regex formatHauteurCase = new Regex($"(?<{gpTaille}>{this.AffecterStringDepuisFichierConfig(configHauteurCases)})px");
+                new Regex($"(?<{gpHeure}>{this.AffecterParametreDepuisFichierConfig(configHeures)})" +
+                $":(?<{gpMinute}>{this.AffecterParametreDepuisFichierConfig(configMinutes)})");
+            Regex formatSemaines = new Regex($"(?<{gpSemaine}>{this.AffecterParametreDepuisFichierConfig(configSemaines)})");
+            Regex formatLigneCours = new Regex(this.AffecterParametreDepuisFichierConfig(configLigneCours));
+            Regex formatLigneVide = new Regex(this.AffecterParametreDepuisFichierConfig(configLigneVide));
+            Regex formatHauteurCase = new Regex($"(?<{gpTaille}>{this.AffecterParametreDepuisFichierConfig(configHauteurCases)})px");
 
             int compteurHeure = -1;
             int tailleHeure = -1;
@@ -200,8 +200,8 @@ namespace CalendrierCours.DAL.SiteInternet
             string gpInfos = "i", gpNumero = "n";
             string configSeance = "formatLigneSeance", configNumero = "formatNumeroCours";
 
-            Regex regexSeance = new Regex($"(?<{gpInfos}>{this.AffecterStringDepuisFichierConfig(configSeance)})");
-            Regex regexNumeroCours = new Regex($"(?<{gpNumero}>{this.AffecterStringDepuisFichierConfig(configNumero)})");
+            Regex regexSeance = new Regex($"(?<{gpInfos}>{this.AffecterParametreDepuisFichierConfig(configSeance)})");
+            Regex regexNumeroCours = new Regex($"(?<{gpNumero}>{this.AffecterParametreDepuisFichierConfig(configNumero)})");
             int positionIntitule = 0, positionNumero = 1, positionProf = 2, positionSalle = 3;
             int PositionNomProf = 0, positionPrenomProf = 1;
 
@@ -250,7 +250,7 @@ namespace CalendrierCours.DAL.SiteInternet
 
             return configuration;
         }
-        private string AffecterStringDepuisFichierConfig(string p_nomParametre)
+        private string AffecterParametreDepuisFichierConfig(string p_nomParametre)
         {
             string? retour;
             IConfigurationRoot configuration = this.LireFichierConfig();

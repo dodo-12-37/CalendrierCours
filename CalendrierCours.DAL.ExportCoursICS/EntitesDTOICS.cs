@@ -1,20 +1,27 @@
 ﻿using CalendrierCours.Entites;
+using Microsoft.Extensions.Configuration;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace CalendrierCours.DAL.ExportCoursVCS
+namespace CalendrierCours.DAL.ExportCoursICS
 {
-    public class CoursVCSDTO
+    public class CoursICSDTO
     {
         #region Membres
         private string m_intitule;
         private string m_numero;
-        private ProfesseurVCSDTO m_enseignant;
-        private List<SeanceVCSDTO> m_seances;
+        private string? m_description;
+        private string? m_categorie;
+        private ProfesseurICSDTO m_enseignant;
+        private List<SeanceICSDTO> m_seances;
         #endregion
 
         #region Ctor
-        public CoursVCSDTO(ProfesseurVCSDTO p_enseignant, string p_intitule)
+        public CoursICSDTO(ProfesseurICSDTO p_enseignant, string p_numero, string p_intitule)
+            : this(p_enseignant, p_numero, p_intitule, null, null, new List<SeanceICSDTO>())
+        { }
+        public CoursICSDTO
+            (ProfesseurICSDTO p_enseignant, string p_numero, string p_intitule, string? p_description, string? p_categorie, List<SeanceICSDTO> p_seances)
         {
             if (p_enseignant is null)
             {
@@ -24,49 +31,42 @@ namespace CalendrierCours.DAL.ExportCoursVCS
             {
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_intitule));
             }
-
-            this.m_enseignant = p_enseignant;
-            this.m_intitule = p_intitule;
-            this.m_seances = new List<SeanceVCSDTO>();
-        }
-        public CoursVCSDTO(ProfesseurVCSDTO p_enseignant, string p_intitule, List<SeanceVCSDTO> p_seances)
-        {
-            if (p_enseignant is null)
+            if (String.IsNullOrWhiteSpace(p_numero))
             {
-                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_enseignant));
-            }
-            if (String.IsNullOrWhiteSpace(p_intitule))
-            {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_intitule));
+                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
             }
             if (p_seances is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_seances));
             }
 
-            Regex regexNumeroCours = new Regex("(?<cours>[0-9]{3}-[A-Z]{1}[0-9]{2}-SF)");
+            Regex regexNumeroCours = new Regex(this.RecupereFormatNumero());
 
-            string numeroCours = "";
-
-            if (regexNumeroCours.IsMatch(p_intitule))
+            if (!regexNumeroCours.IsMatch(p_numero))
             {
-                numeroCours = regexNumeroCours.Match(p_intitule).Groups["cours"].Value;
+                throw new FormatException("Le format du numero ne correspond pas");
             }
 
-            string intituleCours = p_intitule.Replace(numeroCours + " - ", string.Empty);
-
-            this.m_intitule = intituleCours;
-            this.m_numero = numeroCours;
+            this.m_intitule = p_intitule;
+            this.m_numero = p_numero;
             this.m_enseignant = p_enseignant;
             this.m_seances = p_seances;
+            this.m_categorie = p_categorie;
+            this.m_description = p_description;
         }
-        public CoursVCSDTO(Cours p_cours)
-            : this(new ProfesseurVCSDTO(p_cours.Enseignant), p_cours.Intitule, p_cours.Seances.Select(s => new SeanceVCSDTO(s)).ToList())
+        public CoursICSDTO(Cours p_cours)
+            : this(
+                  new ProfesseurICSDTO(p_cours.Enseignant)
+                  , p_cours.Numero
+                  , p_cours.Intitule
+                  , p_cours.Description
+                  , p_cours.Categorie
+                  , p_cours.Seances.Select(s => new SeanceICSDTO(s)).ToList())
         { }
         #endregion
 
         #region Proprietes
-        public ProfesseurVCSDTO Enseignant
+        public ProfesseurICSDTO Enseignant
         {
             get { return this.m_enseignant; }
             set
@@ -77,6 +77,22 @@ namespace CalendrierCours.DAL.ExportCoursVCS
                 }
 
                 this.m_enseignant = value;
+            }
+        }
+        public List<SeanceICSDTO> Seances
+        {
+            get
+            {
+                return this.m_seances;
+            }
+            set
+            {
+                if (value is null)
+                {
+                    throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
+                }
+
+                this.m_seances = value;
             }
         }
         public string Intitule
@@ -102,25 +118,17 @@ namespace CalendrierCours.DAL.ExportCoursVCS
                     throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
                 }
 
+                Regex format = new Regex(this.RecupereFormatNumero());
+                if (!format.IsMatch(value))
+                {
+                    throw new FormatException("Le numero n'est pas au bon format");
+                }
+
                 this.m_intitule = value;
             }
         }
-        public List<SeanceVCSDTO> Seances
-        {
-            get
-            {
-                return this.m_seances;
-            }
-            set
-            {
-                if (value is null)
-                {
-                    throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
-                }
-
-                this.m_seances = value;
-            }
-        }
+        public string? Description { get { return this.m_description; } set { this.m_description = value; } }
+        public string? Categorie { get { return this.m_categorie; } set { this.m_categorie = value; } }
         #endregion
 
         #region Methodes
@@ -128,30 +136,71 @@ namespace CalendrierCours.DAL.ExportCoursVCS
         {
             List<Seance> Seances = this.m_seances.Select(s => s.VersEntite()).ToList();
 
-            return new Cours(this.m_enseignant.VersEntite(), this.m_intitule, Seances);
+            return new Cours(this.m_enseignant.VersEntite(), this.Numero, this.m_intitule, Seances);
         }
         public override bool Equals(object? obj)
         {
-            return obj is CoursVCSDTO cours
+            return obj is CoursICSDTO cours
                 && this.Enseignant.Equals(cours.Enseignant)
+                && Numero == cours.Numero
                 && Intitule == cours.Intitule;
         }
         public override int GetHashCode()
         {
             return HashCode.Combine(Enseignant, Intitule);
         }
+
+        private IConfigurationRoot LireFichierConfig()
+        {
+            IConfigurationRoot? configuration;
+
+            try
+            {
+                configuration =
+                    new ConfigurationBuilder()
+                      .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
+                      .AddJsonFile("appsettings.json", false)
+                      .Build();
+            }
+            catch (Exception e)
+            {
+                throw new InvalidDepotException("Le fichier de configuration est corrompu", e);
+            }
+
+            return configuration;
+        }
+        private string RecupereFormatNumero()
+        {
+            string? retour;
+            IConfigurationRoot configuration = this.LireFichierConfig();
+
+            if (configuration is null)
+            {
+                throw new Exception("Erreur dans la lecture du fichier de configuration");
+            }
+
+            retour = configuration["formatNumeroCours"];
+
+            if (retour is null)
+            {
+                throw new Exception("Erreur dans la lecture du fichier de configuration");
+            }
+
+            return retour;
+        }
         #endregion
     }
-    public class SeanceVCSDTO
+    public class SeanceICSDTO
     {
         #region Membres
         private DateTime m_dateDebut;
         private DateTime m_dateFin;
         private string m_salle;
+        private Guid m_uid;
         #endregion
 
         #region Ctor
-        public SeanceVCSDTO(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
+        public SeanceICSDTO(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
         {
             if (p_dateDebut >= p_dateFin)
             {
@@ -165,8 +214,9 @@ namespace CalendrierCours.DAL.ExportCoursVCS
             this.m_dateDebut = p_dateDebut;
             this.m_dateFin = p_dateFin;
             this.m_salle = p_salle;
+            this.m_uid = Guid.NewGuid();
         }
-        public SeanceVCSDTO(Seance p_seance) : this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle) { }
+        public SeanceICSDTO(Seance p_seance) : this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle) { }
         #endregion
 
         #region Proprietes
@@ -209,6 +259,7 @@ namespace CalendrierCours.DAL.ExportCoursVCS
                 this.m_salle = value;
             }
         }
+        public Guid UID { get { return this.m_uid; } }
         #endregion
 
         #region Methodes
@@ -218,7 +269,7 @@ namespace CalendrierCours.DAL.ExportCoursVCS
         }
         public override bool Equals(object? obj)
         {
-            return obj is SeanceVCSDTO seance
+            return obj is SeanceICSDTO seance
                 && seance.DateDebut == this.DateDebut
                 && seance.DateFin == this.DateFin
                 && seance.Salle == this.Salle;
@@ -229,7 +280,7 @@ namespace CalendrierCours.DAL.ExportCoursVCS
         }
         #endregion
     }
-    public class ProfesseurVCSDTO
+    public class ProfesseurICSDTO
     {
         #region Membres
         private string m_nom;
@@ -237,7 +288,7 @@ namespace CalendrierCours.DAL.ExportCoursVCS
         #endregion
 
         #region Ctor
-        public ProfesseurVCSDTO(string p_nom, string p_prenom)
+        public ProfesseurICSDTO(string p_nom, string p_prenom)
         {
             if (String.IsNullOrWhiteSpace(p_nom))
             {
@@ -251,7 +302,7 @@ namespace CalendrierCours.DAL.ExportCoursVCS
             this.m_nom = p_nom;
             this.m_prenom = p_prenom;
         }
-        public ProfesseurVCSDTO(Professeur p_enseigant) : this(p_enseigant.Nom, p_enseigant.Prenom) { }
+        public ProfesseurICSDTO(Professeur p_enseigant) : this(p_enseigant.Nom, p_enseigant.Prenom) { }
         #endregion
 
         #region Proprietes
@@ -290,7 +341,7 @@ namespace CalendrierCours.DAL.ExportCoursVCS
         }
         public override bool Equals(object? obj)
         {
-            return obj is ProfesseurVCSDTO professeur &&
+            return obj is ProfesseurICSDTO professeur &&
                    Nom == professeur.Nom &&
                    Prenom == professeur.Prenom;
         }

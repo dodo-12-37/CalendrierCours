@@ -16,10 +16,4 @@
     <ProjectReference Include="..\CalendrierCours.Entites\CalendrierCours.Entites.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

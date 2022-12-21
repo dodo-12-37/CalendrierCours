@@ -241,6 +241,7 @@ namespace CalendrierCours.DAL.SiteInternet
         {
             return obj is CoursInternetDTO cours
                 && this.Enseignant.Equals(cours.Enseignant)
+                && Numero == cours.Numero
                 && Intitule == cours.Intitule;
         }
         public override int GetHashCode()

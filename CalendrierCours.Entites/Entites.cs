@@ -229,6 +229,7 @@ namespace CalendrierCours.Entites
         {
             return obj is Cours cours
                 && this.Enseignant.Equals(cours.Enseignant)
+                && Numero == cours.Numero
                 && Intitule == cours.Intitule;
         }
         public override int GetHashCode()

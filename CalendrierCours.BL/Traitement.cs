@@ -50,7 +50,7 @@ namespace CalendrierCours.BL
             }
 
             List<Cours> listeExport = this.ListerCours(p_cohorte)
-                .Select(c => new Cours(c.Enseignant, c.Intitule, c.Seances
+                .Select(c => new Cours(c.Enseignant, c.Numero, c.Intitule, c.Seances
                     .Where(s => s.DateDebut >= p_date)
                     .ToList()))
                 .ToList();
@@ -85,7 +85,7 @@ namespace CalendrierCours.BL
 
             List<Cours> listeExport = this.ListerCours(p_cohorte)
                 .Where(c => c.Enseignant.Equals(p_professeur))
-                .Select(c => new Cours(c.Enseignant, c.Intitule, c.Seances
+                .Select(c => new Cours(c.Enseignant, c.Numero, c.Intitule, c.Seances
                     .Where(s => s.DateDebut >= p_date)
                     .ToList()))
                 .ToList();

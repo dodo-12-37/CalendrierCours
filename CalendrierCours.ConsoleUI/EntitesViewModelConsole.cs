@@ -1,4 +1,6 @@
-﻿using CalendrierCours.Entites;
+﻿using CalendrierCours.DAL.SiteInternet;
+using CalendrierCours.Entites;
+using Microsoft.Extensions.Configuration;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -37,7 +39,7 @@ namespace CalendrierCours.ConsoleUI
             this.m_listeCours = p_listeCours;
             this.m_numero = p_numero;
         }
-        public CohorteViewModelConsole(Cohorte p_cohorte) 
+        public CohorteViewModelConsole(Cohorte p_cohorte)
             : this(p_cohorte.Cours.Select(c => new CoursViewModelConsole(c)).ToList(), p_cohorte.Numero)
         { }
         #endregion
@@ -97,27 +99,16 @@ namespace CalendrierCours.ConsoleUI
     {
         #region Membres
         private ProfesseurViewModelConsole m_enseignant;
-        private string m_intitule;
         private List<SeanceViewModelConsole> m_seances;
+        private string m_intitule;
+        private string m_numero;
         #endregion
 
         #region Ctor
-        public CoursViewModelConsole(ProfesseurViewModelConsole p_enseignant, string p_intitule)
-        {
-            if (p_enseignant is null)
-            {
-                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_enseignant));
-            }
-            if (String.IsNullOrWhiteSpace(p_intitule))
-            {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_intitule));
-            }
-
-            this.m_enseignant = p_enseignant;
-            this.m_intitule = p_intitule;
-            this.m_seances = new List<SeanceViewModelConsole>();
-        }
-        public CoursViewModelConsole(ProfesseurViewModelConsole p_enseignant, string p_intitule, List<SeanceViewModelConsole> p_seances)
+        public CoursViewModelConsole(ProfesseurViewModelConsole p_enseignant, string p_numero, string p_intitule)
+            : this(p_enseignant, p_numero, p_intitule, new List<SeanceViewModelConsole>())
+        { }
+        public CoursViewModelConsole(ProfesseurViewModelConsole p_enseignant, string p_numero, string p_intitule, List<SeanceViewModelConsole> p_seances)
         {
             if (p_enseignant is null)
             {
@@ -132,12 +123,19 @@ namespace CalendrierCours.ConsoleUI
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_seances));
             }
 
+            Regex formatNumero = new Regex(this.RecupereFormatNumero());
+            if (!formatNumero.IsMatch(p_numero))
+            {
+                throw new FormatException("Le numero n'est pas au bon format");
+            }
+
             this.m_enseignant = p_enseignant;
             this.m_intitule = p_intitule;
             this.m_seances = p_seances;
+            this.m_numero = p_numero;
         }
-        public CoursViewModelConsole(Cours p_cours) 
-            : this(new ProfesseurViewModelConsole(p_cours.Enseignant), p_cours.Intitule, p_cours.Seances.Select(s => new SeanceViewModelConsole(s)).ToList()) 
+        public CoursViewModelConsole(Cours p_cours)
+            : this(new ProfesseurViewModelConsole(p_cours.Enseignant), p_cours.Numero, p_cours.Intitule, p_cours.Seances.Select(s => new SeanceViewModelConsole(s)).ToList())
         { }
         #endregion
 
@@ -168,6 +166,25 @@ namespace CalendrierCours.ConsoleUI
                 this.m_intitule = value;
             }
         }
+        public string Numero
+        {
+            get { return this.m_numero; }
+            set
+            {
+                if (String.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                }
+
+                Regex formatNumero = new Regex(this.RecupereFormatNumero());
+                if (!formatNumero.IsMatch(value))
+                {
+                    throw new FormatException("Le numero n'est pas au bon format");
+                }
+
+                this.m_numero = value;
+            }
+        }
         public List<SeanceViewModelConsole> Seances
         {
             get
@@ -191,18 +208,13 @@ namespace CalendrierCours.ConsoleUI
         {
             List<Seance> Seances = this.m_seances.Select(s => s.VersEntite()).ToList();
 
-            return new Cours(this.m_enseignant.VersEntite(), this.m_intitule, Seances);
+            return new Cours(this.m_enseignant.VersEntite(), this.m_numero, this.m_intitule, Seances);
         }
         public override string ToString()
         {
-            Regex regexNumeroCours = new Regex("(?<cours>[0-9]{3}-[A-Z]{1}[0-9]{2}-SF)");
-
-            string numeroCours = regexNumeroCours.Match(this.m_intitule).Groups["cours"].Value;
-            string intituleCours = this.m_intitule.Replace(numeroCours + " - ", string.Empty);
-
             StringBuilder sb = new StringBuilder();
 
-            sb.Append($"Cours n° {numeroCours} - {intituleCours} ");
+            sb.Append($"Cours n° {this.Numero} - {this.Intitule} ");
             sb.Append($"donné par {this.Enseignant.ToString()} ");
             sb.AppendLine($"- Nombre de séances : {this.Seances.Count}");
             this.m_seances.ForEach(s => sb.AppendLine($"\t{s.ToString()}"));
@@ -213,11 +225,51 @@ namespace CalendrierCours.ConsoleUI
         {
             return obj is CoursViewModelConsole cours
                 && this.Enseignant.Equals(cours.Enseignant)
+                && Numero == cours.Numero
                 && Intitule == cours.Intitule;
         }
         public override int GetHashCode()
         {
             return HashCode.Combine(Enseignant, Intitule);
+        }
+
+        private IConfigurationRoot LireFichierConfig()
+        {
+            IConfigurationRoot? configuration;
+
+            try
+            {
+                configuration =
+                    new ConfigurationBuilder()
+                      .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
+                      .AddJsonFile("appsettings.json", false)
+                      .Build();
+            }
+            catch (Exception e)
+            {
+                throw new InvalidDepotException("Le fichier de configuration est corrompu", e);
+            }
+
+            return configuration;
+        }
+        private string RecupereFormatNumero()
+        {
+            string? retour;
+            IConfigurationRoot configuration = this.LireFichierConfig();
+
+            if (configuration is null)
+            {
+                throw new Exception("Erreur dans la lecture du fichier de configuration");
+            }
+
+            retour = configuration["formatNumeroCours"];
+
+            if (retour is null)
+            {
+                throw new Exception("Erreur dans la lecture du fichier de configuration");
+            }
+
+            return retour;
         }
         #endregion
     }
@@ -297,12 +349,12 @@ namespace CalendrierCours.ConsoleUI
         }
         public override string ToString()
         {
-            CultureInfo cultureInfo= CultureInfo.CreateSpecificCulture("fr-CA");
+            CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture("fr-CA");
             StringBuilder sb = new StringBuilder();
 
             sb.Append($"Le {this.m_dateDebut.ToString("dddd dd MMMM yyyy", cultureInfo)} ");
-            sb.Append($"de {this.m_dateDebut.ToString("HH:mm", cultureInfo)}" );
-            sb.Append($" à {this.m_dateFin.ToString("HH:mm", cultureInfo)}" );
+            sb.Append($"de {this.m_dateDebut.ToString("HH:mm", cultureInfo)}");
+            sb.Append($" à {this.m_dateFin.ToString("HH:mm", cultureInfo)}");
 
             return sb.ToString();
         }

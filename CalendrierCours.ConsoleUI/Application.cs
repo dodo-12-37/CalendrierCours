@@ -1,9 +1,6 @@
 ﻿using CalendrierCours.BL;
-using CalendrierCours.DAL.ExportCoursVCS;
+using CalendrierCours.DAL.ExportCoursICS;
 using CalendrierCours.Entites;
-using System;
-using System.IO;
-using System.Runtime.InteropServices;
 
 namespace CalendrierCours.ConsoleUI
 {
@@ -101,7 +98,7 @@ namespace CalendrierCours.ConsoleUI
             };
             this.m_menuExportCours = new Dictionary<int, string>()
             {
-                {1, "Format ICalendar (cvs)" }
+                {1, "Format ICalendar (ics)" }
             };
         }
         private void InitialisationAffichage()
@@ -399,7 +396,7 @@ namespace CalendrierCours.ConsoleUI
         }
         private IExportFichier RecupererObjetExport(int p_index)
         {
-            return new ExportCoursVCS();
+            return new ExportCoursICS();
         }
 
         private bool MiseAJoursCohorteActiveDepuisTraitement()

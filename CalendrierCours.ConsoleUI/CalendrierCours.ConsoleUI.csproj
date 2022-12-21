@@ -9,8 +9,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CalendrierCours.BL\CalendrierCours.BL.csproj" />
-    <ProjectReference Include="..\CalendrierCours.DAL.ExportCoursVCS\CalendrierCours.DAL.ExportCoursVCS.csproj" />
+    <ProjectReference Include="..\CalendrierCours.DAL.ExportCoursICS\CalendrierCours.DAL.ExportCoursICS.csproj" />
     <ProjectReference Include="..\CalendrierCours.Entites\CalendrierCours.Entites.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
