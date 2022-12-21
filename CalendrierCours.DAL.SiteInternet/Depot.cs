@@ -24,10 +24,6 @@ namespace CalendrierCours.DAL.SiteInternet
         }
         #endregion
 
-        #region Proprietes
-
-        #endregion
-
         #region Methodes
         public List<Cohorte> RecupererCohortes()
         {
@@ -274,6 +270,5 @@ namespace CalendrierCours.DAL.SiteInternet
             return retour;
         }
         #endregion
-
     }
 }
