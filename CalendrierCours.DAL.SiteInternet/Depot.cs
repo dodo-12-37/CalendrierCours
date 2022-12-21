@@ -31,7 +31,7 @@ namespace CalendrierCours.DAL.SiteInternet
         #region Methodes
         public List<Cohorte> RecupererCohortes()
         {
-            string? contenuInternet = this.RecupererContenu();
+            string? contenuInternet = this.RecupererContenuSite();
 
             if (String.IsNullOrEmpty(contenuInternet))
             {
@@ -42,7 +42,7 @@ namespace CalendrierCours.DAL.SiteInternet
             List<Cohorte> listeRetour = new List<Cohorte>();
 
             listeRetour = lignesContenuInternet
-                .Where(str => str.Contains("option value"))
+                .Where(str => str.Contains(this.AffecterStringDepuisFichierConfig("formatListeCohorte")))
                 .Select(str =>
                 {
                     string[] valeurs = str.Split("\"");
@@ -58,7 +58,7 @@ namespace CalendrierCours.DAL.SiteInternet
         {
             string url = m_urlSiteCsfoyCohorte + p_cohorte.Numero;
 
-            string? contenuInternet = RecupererContenu(url);
+            string? contenuInternet = RecupererContenuSite(url);
 
             if (String.IsNullOrEmpty(contenuInternet))
             {
@@ -81,7 +81,7 @@ namespace CalendrierCours.DAL.SiteInternet
 
             return listeRetour;
         }
-        private string? RecupererContenu(string? p_url = null)
+        private string? RecupererContenuSite(string? p_url = null)
         {
             string? retour = null;
             string url = "";
@@ -119,13 +119,17 @@ namespace CalendrierCours.DAL.SiteInternet
         {
             List<CoursInternetDTO> listeRetour = new List<CoursInternetDTO>();
 
+            string gpHeure = "h", gpMinute = "m", gpSemaine = "s", gpTaille = "t";
+            string configHeures = "formatHeures", configMinutes = "formatMinutes", configSemaines = "formatSemaine";
+            string configLigneCours = "formatLigneCours", configLigneVide = "formatLignevide", configHauteurCases = "formatHeuteurCase";
+
             Regex formatHeures = 
-                new Regex($"(?<heure>{this.AffecterStringDepuisFichierConfig("formatHeures")})" +
-                $":(?<minute>{this.AffecterStringDepuisFichierConfig("formatMinutes")})");
-            Regex formatSemaines = new Regex($"(?<semaine>{this.AffecterStringDepuisFichierConfig("formatSemaine")})");
-            Regex formatLigneCours = new Regex(this.AffecterStringDepuisFichierConfig("formatLigneCours"));
-            Regex formatLigneVide = new Regex(this.AffecterStringDepuisFichierConfig("formatLignevide"));
-            Regex formatHauteurCase = new Regex($"(?<taille>{this.AffecterStringDepuisFichierConfig("formatHeuteurCase")})px");
+                new Regex($"(?<{gpHeure}>{this.AffecterStringDepuisFichierConfig(configHeures)})" +
+                $":(?<{gpMinute}>{this.AffecterStringDepuisFichierConfig(configMinutes)})");
+            Regex formatSemaines = new Regex($"(?<{gpSemaine}>{this.AffecterStringDepuisFichierConfig(configSemaines)})");
+            Regex formatLigneCours = new Regex(this.AffecterStringDepuisFichierConfig(configLigneCours));
+            Regex formatLigneVide = new Regex(this.AffecterStringDepuisFichierConfig(configLigneVide));
+            Regex formatHauteurCase = new Regex($"(?<{gpTaille}>{this.AffecterStringDepuisFichierConfig(configHauteurCases)})px");
 
             int compteurHeure = -1;
             int tailleHeure = -1;
@@ -142,7 +146,7 @@ namespace CalendrierCours.DAL.SiteInternet
 
                 if (matchSemaine.Success)
                 {
-                    premierJourSemaine = DateTime.Parse(matchSemaine.Groups["semaine"].Value);
+                    premierJourSemaine = DateTime.Parse(matchSemaine.Groups[gpSemaine].Value);
                     horaires = new List<DateTime>();
                     compteurHeure = 0;
                     tailleHeure = 0;
@@ -150,12 +154,12 @@ namespace CalendrierCours.DAL.SiteInternet
                 else if (matchHeures.Success)
                 {
                     compteurHeure++;
-                    double heure = double.Parse(matchHeures.Groups["heure"].Value);
-                    double minute = double.Parse(matchHeures.Groups["minute"].Value);
+                    double heure = double.Parse(matchHeures.Groups[gpHeure].Value);
+                    double minute = double.Parse(matchHeures.Groups[gpMinute].Value);
                     horaires.Add(premierJourSemaine.AddHours(heure).AddMinutes(minute));
                     if (tailleHeure == 0)
                     {
-                        tailleHeure = int.Parse(formatHauteurCase.Match(ligne).Groups["taille"].Value);
+                        tailleHeure = int.Parse(formatHauteurCase.Match(ligne).Groups[gpTaille].Value);
                     }
                 }
                 else if (matchVide.Success)
@@ -165,7 +169,7 @@ namespace CalendrierCours.DAL.SiteInternet
                 else if (matchCours.Success)
                 {
                     DateTime dateDebut = horaires[horaires.Count - compteurHeure];
-                    int tempsCours = int.Parse(formatHauteurCase.Match(ligne).Groups["taille"].Value) / tailleHeure;
+                    int tempsCours = int.Parse(formatHauteurCase.Match(ligne).Groups[gpTaille].Value) / tailleHeure;
                     DateTime dateFin = horaires[horaires.Count - compteurHeure + tempsCours];
 
                     CoursInternetDTO nvCours = this.TransformerLigneNouvelleSeance(ligne, dateDebut, dateFin);
@@ -197,17 +201,20 @@ namespace CalendrierCours.DAL.SiteInternet
         }
         private CoursInternetDTO TransformerLigneNouvelleSeance(string p_ligne, DateTime p_dateDebut, DateTime p_dateFin)
         {
-            Regex regexSeance = new Regex($"(?<infos>{this.AffecterStringDepuisFichierConfig("formatLigneSeance")})");
-            Regex regexNumeroCours = new Regex($"(?<numero>{this.AffecterStringDepuisFichierConfig("formatNumeroCours")})");
+            string gpInfos = "i", gpNumero = "n";
+            string configSeance = "formatLigneSeance", configNumero = "formatNumeroCours";
+
+            Regex regexSeance = new Regex($"(?<{gpInfos}>{this.AffecterStringDepuisFichierConfig(configSeance)})");
+            Regex regexNumeroCours = new Regex($"(?<{gpNumero}>{this.AffecterStringDepuisFichierConfig(configNumero)})");
             int positionIntitule = 0, positionNumero = 1, positionProf = 2, positionSalle = 3;
             int PositionNomProf = 0, positionPrenomProf = 1;
 
-            string info = regexSeance.Match(p_ligne).Groups["infos"].Value;
+            string info = regexSeance.Match(p_ligne).Groups[gpInfos].Value;
             string[] infos = info.Split("<br>");
             infos[positionSalle] = infos[positionSalle].Replace("</td></tr>", String.Empty);
 
             string intituleCours = infos[positionIntitule];
-            string numeroCours = regexNumeroCours.Match(infos[positionNumero]).Groups["numero"].Value;
+            string numeroCours = regexNumeroCours.Match(infos[positionNumero]).Groups[gpNumero].Value;
 
             string[] professeur = infos[positionProf].Split(", ");
 
