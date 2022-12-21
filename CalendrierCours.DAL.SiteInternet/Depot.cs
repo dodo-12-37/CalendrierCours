@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Text.RegularExpressions;
 using CalendrierCours.Entites;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +17,10 @@ namespace CalendrierCours.DAL.SiteInternet
         #region Ctor
         public DepotSiteInternet()
         {
-            this.LireFichierConfig();
+            IConfigurationRoot configuration = this.LireFichierConfig();
+
+            this.m_urlSiteCsfoy = this.AffecterStringDepuisFichierConfig("urlSiteInternet");
+            this.m_urlSiteCsfoyCohorte = this.AffecterStringDepuisFichierConfig("urlAvecCohorte");
         }
         #endregion
 
@@ -53,10 +57,6 @@ namespace CalendrierCours.DAL.SiteInternet
         public List<Cours> RecupererCours(Cohorte p_cohorte)
         {
             string url = m_urlSiteCsfoyCohorte + p_cohorte.Numero;
-            Regex regexHeures = new Regex("[0-9]{1,2}:[0-9]{2}");
-            Regex regexSemaines = new Regex("[0-9]{2}-[0-9]{2}-[0-9]{2}");
-            Regex regexJours = new Regex("([0-9]{2,3}px)+.*(ligne1|vide){1}");
-
 
             string? contenuInternet = RecupererContenu(url);
 
@@ -119,11 +119,13 @@ namespace CalendrierCours.DAL.SiteInternet
         {
             List<CoursInternetDTO> listeRetour = new List<CoursInternetDTO>();
 
-            Regex regexHeures = new Regex("(?<heure>[0-9]{1,2}):(?<minute>[0-9]{2})");
-            Regex regexSemaines = new Regex("(?<semaine>[0-9]{4}-[0-9]{2}-[0-9]{2})");
-            Regex regexCours = new Regex("([0-9]{2,3}px)+.*ligne1");
-            Regex regexVide = new Regex("class=\"vide\"");
-            Regex taille = new Regex("(?<taille>[0-9]{2,3})px");
+            Regex formatHeures = 
+                new Regex($"(?<heure>{this.AffecterStringDepuisFichierConfig("formatHeures")})" +
+                $":(?<minute>{this.AffecterStringDepuisFichierConfig("formatMinutes")})");
+            Regex formatSemaines = new Regex($"(?<semaine>{this.AffecterStringDepuisFichierConfig("formatSemaine")})");
+            Regex formatLigneCours = new Regex(this.AffecterStringDepuisFichierConfig("formatLigneCours"));
+            Regex formatLigneVide = new Regex(this.AffecterStringDepuisFichierConfig("formatLignevide"));
+            Regex formatHauteurCase = new Regex($"(?<taille>{this.AffecterStringDepuisFichierConfig("formatHeuteurCase")})px");
 
             int compteurHeure = -1;
             int tailleHeure = -1;
@@ -131,12 +133,12 @@ namespace CalendrierCours.DAL.SiteInternet
             DateTime premierJourSemaine = new DateTime();
             List<DateTime> horaires = new List<DateTime>();
 
-            foreach (string l in p_liste)
+            foreach (string ligne in p_liste)
             {
-                Match matchSemaine = regexSemaines.Match(l);
-                Match matchHeures = regexHeures.Match(l);
-                Match matchCours = regexCours.Match(l);
-                Match matchVide = regexVide.Match(l);
+                Match matchSemaine = formatSemaines.Match(ligne);
+                Match matchHeures = formatHeures.Match(ligne);
+                Match matchCours = formatLigneCours.Match(ligne);
+                Match matchVide = formatLigneVide.Match(ligne);
 
                 if (matchSemaine.Success)
                 {
@@ -153,7 +155,7 @@ namespace CalendrierCours.DAL.SiteInternet
                     horaires.Add(premierJourSemaine.AddHours(heure).AddMinutes(minute));
                     if (tailleHeure == 0)
                     {
-                        tailleHeure = int.Parse(taille.Match(l).Groups["taille"].Value);
+                        tailleHeure = int.Parse(formatHauteurCase.Match(ligne).Groups["taille"].Value);
                     }
                 }
                 else if (matchVide.Success)
@@ -163,10 +165,10 @@ namespace CalendrierCours.DAL.SiteInternet
                 else if (matchCours.Success)
                 {
                     DateTime dateDebut = horaires[horaires.Count - compteurHeure];
-                    int tempsCours = int.Parse(taille.Match(l).Groups["taille"].Value) / tailleHeure;
+                    int tempsCours = int.Parse(formatHauteurCase.Match(ligne).Groups["taille"].Value) / tailleHeure;
                     DateTime dateFin = horaires[horaires.Count - compteurHeure + tempsCours];
 
-                    CoursInternetDTO nvCours = this.TransformerLigneNouvelleSeance(l, dateDebut, dateFin);
+                    CoursInternetDTO nvCours = this.TransformerLigneNouvelleSeance(ligne, dateDebut, dateFin);
                     CoursInternetDTO? coursExistant = listeRetour.SingleOrDefault(c => c.Equals(nvCours));
 
                     if (coursExistant != default)
@@ -195,16 +197,17 @@ namespace CalendrierCours.DAL.SiteInternet
         }
         private CoursInternetDTO TransformerLigneNouvelleSeance(string p_ligne, DateTime p_dateDebut, DateTime p_dateFin)
         {
-            Regex regexSeance = new Regex("(?<infos>[A-Z]{1}.+)");
-            Regex regexNumeroCours = new Regex("(?<cours>[0-9]{3}-[A-Z0-9]{3}-SF)");
+            Regex regexSeance = new Regex($"(?<infos>{this.AffecterStringDepuisFichierConfig("formatLigneSeance")})");
+            Regex regexNumeroCours = new Regex($"(?<numero>{this.AffecterStringDepuisFichierConfig("formatNumeroCours")})");
             int positionIntitule = 0, positionNumero = 1, positionProf = 2, positionSalle = 3;
             int PositionNomProf = 0, positionPrenomProf = 1;
 
             string info = regexSeance.Match(p_ligne).Groups["infos"].Value;
             string[] infos = info.Split("<br>");
-            infos[positionSalle] = infos[positionSalle].Replace("</td></tr>", "");
+            infos[positionSalle] = infos[positionSalle].Replace("</td></tr>", String.Empty);
 
-            string nomCours = regexNumeroCours.Match(infos[positionNumero]).Groups["cours"].Value + " - " + infos[positionIntitule];
+            string intituleCours = infos[positionIntitule];
+            string numeroCours = regexNumeroCours.Match(infos[positionNumero]).Groups["numero"].Value;
 
             string[] professeur = infos[positionProf].Split(", ");
 
@@ -219,30 +222,49 @@ namespace CalendrierCours.DAL.SiteInternet
                 nvProf = new ProfesseurInternetDTO("-", "-");
             }
 
-            CoursInternetDTO nvCours = new CoursInternetDTO(nvProf, nomCours);
+            CoursInternetDTO nvCours = new CoursInternetDTO(nvProf, numeroCours, intituleCours);
             SeanceInternetDTO nvSeance = new SeanceInternetDTO(p_dateDebut, p_dateFin, infos[positionSalle]);
             nvCours.Seances.Add(nvSeance);
 
             return nvCours;
         }
-        private void LireFichierConfig()
+        private IConfigurationRoot LireFichierConfig()
         {
+            IConfigurationRoot? configuration;
+
             try
             {
-                IConfigurationRoot configuration =
+                configuration =
                     new ConfigurationBuilder()
                       .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
                       .AddJsonFile("appsettings.json", false)
                       .Build();
-
-                this.m_urlSiteCsfoy = configuration["UrlSiteInternet"];
-                this.m_urlSiteCsfoyCohorte = configuration["UrlAvecCohorte"];
             }
             catch (Exception e)
             {
                 throw new InvalidDepotException("Le fichier de configuration est corrompu", e);
             }
 
+            return configuration;
+        }
+        private string AffecterStringDepuisFichierConfig(string p_nomParametre)
+        {
+            string? retour;
+            IConfigurationRoot configuration = this.LireFichierConfig();
+
+            if (configuration is null)
+            {
+                throw new Exception("Erreur dans la lecture du fichier de configuration");
+            }
+
+            retour = configuration[p_nomParametre];
+
+            if (retour is null)
+            {
+                throw new Exception("Erreur dans la lecture du fichier de configuration");
+            }
+
+            return retour;
         }
         #endregion
 

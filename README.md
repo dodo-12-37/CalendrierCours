@@ -16,3 +16,4 @@ Application servant à récupérer les informations des séances de cours des di
  - <strong>En cours</strong> Application winform
  - Exporation au format vcs
  - <strong>En cours</strong> Optimisation de l'existant
+ - <strong>En cours</strong> Possibilité de récupérer l'ensemble des cohortes

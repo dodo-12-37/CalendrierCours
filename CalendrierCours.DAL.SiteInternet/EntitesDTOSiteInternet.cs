@@ -1,4 +1,6 @@
 ﻿using CalendrierCours.Entites;
+using Microsoft.Extensions.Configuration;
+using System.Text.RegularExpressions;
 
 namespace CalendrierCours.DAL.SiteInternet
 {
@@ -80,12 +82,16 @@ namespace CalendrierCours.DAL.SiteInternet
     {
         #region Membres
         private ProfesseurInternetDTO m_enseignant;
-        private string m_intitule;
         private List<SeanceInternetDTO> m_seances;
+        private string m_intitule;
+        private string m_numero;
         #endregion
 
         #region Ctor
-        public CoursInternetDTO(ProfesseurInternetDTO p_enseignant, string p_intitule)
+        public CoursInternetDTO(ProfesseurInternetDTO p_enseignant, string p_numero, string p_intitule)
+            : this(p_enseignant, p_numero, p_intitule, new List<SeanceInternetDTO>())
+        { }
+        public CoursInternetDTO(ProfesseurInternetDTO p_enseignant, string p_numero, string p_intitule, List<SeanceInternetDTO> p_seances)
         {
             if (p_enseignant is null)
             {
@@ -95,32 +101,28 @@ namespace CalendrierCours.DAL.SiteInternet
             {
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_intitule));
             }
-
-            this.m_enseignant = p_enseignant;
-            this.m_intitule = p_intitule;
-            this.m_seances = new List<SeanceInternetDTO>();
-        }
-        public CoursInternetDTO(ProfesseurInternetDTO p_enseignant, string p_intitule, List<SeanceInternetDTO> p_seances)
-        {
-            if (p_enseignant is null)
+            if (String.IsNullOrWhiteSpace(p_numero))
             {
-                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_enseignant));
-            }
-            if (String.IsNullOrWhiteSpace(p_intitule))
-            {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_intitule));
+                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
             }
             if (p_seances is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_seances));
             }
 
+            Regex formatNumero = new Regex(this.RecupereFormatNumero());
+            if (!formatNumero.IsMatch(p_numero))
+            {
+                throw new FormatException("Le format du numero n'est pas correcte");
+            }
+
             this.m_enseignant = p_enseignant;
             this.m_intitule = p_intitule;
             this.m_seances = p_seances;
+            this.m_numero = p_numero;
         }
         public CoursInternetDTO(Cours p_cours)
-            : this(new ProfesseurInternetDTO(p_cours.Enseignant), p_cours.Intitule, p_cours.Seances.Select(s => new SeanceInternetDTO(s)).ToList())
+            : this(new ProfesseurInternetDTO(p_cours.Enseignant), p_cours.Numero, p_cours.Intitule, p_cours.Seances.Select(s => new SeanceInternetDTO(s)).ToList())
         { }
         #endregion
 
@@ -151,6 +153,25 @@ namespace CalendrierCours.DAL.SiteInternet
                 this.m_intitule = value;
             }
         }
+        public string Numero
+        {
+            get { return this.m_numero; }
+            set
+            {
+                if (String.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                }
+
+                Regex formatNumero = new Regex(this.RecupereFormatNumero());
+                if (!formatNumero.IsMatch(value))
+                {
+                    throw new FormatException("Le format du numero n'est pas correcte");
+                }
+
+                this.m_numero = value;
+            }
+        }
         public List<SeanceInternetDTO> Seances
         {
             get
@@ -174,8 +195,48 @@ namespace CalendrierCours.DAL.SiteInternet
         {
             List<Seance> Seances = this.m_seances.Select(s => s.VersEntite()).ToList();
 
-            return new Cours(this.m_enseignant.VersEntite(), this.m_intitule, Seances);
+            return new Cours(this.m_enseignant.VersEntite(), this.m_numero, this.m_intitule, Seances);
         }
+
+        private IConfigurationRoot LireFichierConfig()
+        {
+            IConfigurationRoot? configuration;
+
+            try
+            {
+                configuration =
+                    new ConfigurationBuilder()
+                      .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
+                      .AddJsonFile("appsettings.json", false)
+                      .Build();
+            }
+            catch (Exception e)
+            {
+                throw new InvalidDepotException("Le fichier de configuration est corrompu", e);
+            }
+
+            return configuration;
+        }
+        private string RecupereFormatNumero()
+        {
+            string? retour;
+            IConfigurationRoot configuration = this.LireFichierConfig();
+
+            if (configuration is null)
+            {
+                throw new Exception("Erreur dans la lecture du fichier de configuration");
+            }
+
+            retour = configuration["formatNumeroCours"];
+
+            if (retour is null)
+            {
+                throw new Exception("Erreur dans la lecture du fichier de configuration");
+            }
+
+            return retour;
+        }
+
         public override bool Equals(object? obj)
         {
             return obj is CoursInternetDTO cours

@@ -1,4 +1,8 @@
-﻿namespace CalendrierCours.Entites
+﻿using Microsoft.Extensions.Configuration;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+
+namespace CalendrierCours.Entites
 {
     public class Cohorte
     {
@@ -72,18 +76,28 @@
             return obj is Cohorte cohorte
                 && cohorte.m_numero == this.m_numero;
         }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(this.m_numero);
+        }
         #endregion
     }
     public class Cours
     {
         #region Membres
         private Professeur m_enseignant;
-        private string m_intitule;
         private List<Seance> m_seances;
+        private string m_intitule;
+        private string m_numero;
+        private string? m_description;
+        private string? m_categorie;
+        private Regex m_formatNumero;
         #endregion
 
         #region Ctor
-        public Cours(Professeur p_enseignant, string p_intitule)
+        public Cours(Professeur p_enseignant, string p_numero, string p_intitule) : this(p_enseignant, p_numero, p_intitule, new List<Seance>())
+        { }
+        public Cours(Professeur p_enseignant, string p_numero, string p_intitule, List<Seance> p_seances)
         {
             if (p_enseignant is null)
             {
@@ -93,29 +107,28 @@
             {
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_intitule));
             }
-
-            this.m_enseignant = p_enseignant;
-            this.m_intitule = p_intitule;
-            this.m_seances = new List<Seance>();
-        }
-        public Cours(Professeur p_enseignant, string p_intitule, List<Seance> p_seances)
-        {
-            if (p_enseignant is null)
+            if (String.IsNullOrWhiteSpace(p_numero))
             {
-                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_enseignant));
-            }
-            if (String.IsNullOrWhiteSpace(p_intitule))
-            {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_intitule));
+                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
             }
             if (p_seances is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_seances));
             }
 
+            m_formatNumero = new Regex(this.LireFichierConfig());
+
+            if (!this.m_formatNumero.IsMatch(p_numero))
+            {
+                throw new FormatException("Le numero ne correspond pas au format");
+            }
+
             this.m_enseignant = p_enseignant;
-            this.m_intitule = p_intitule;
             this.m_seances = p_seances;
+            this.m_intitule = p_intitule;
+            this.m_numero = p_numero;
+            this.m_description = null;
+            this.m_categorie = null;
         }
         #endregion
 
@@ -131,19 +144,6 @@
                 }
 
                 this.m_enseignant = value;
-            }
-        }
-        public string Intitule
-        {
-            get { return this.m_intitule; }
-            set
-            {
-                if (String.IsNullOrWhiteSpace(value))
-                {
-                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
-                }
-
-                this.m_intitule = value;
             }
         }
         public List<Seance> Seances
@@ -164,9 +164,67 @@
                 this.m_seances = value;
             }
         }
+        public string Intitule
+        {
+            get { return this.m_intitule; }
+            set
+            {
+                if (String.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                }
+
+                this.m_intitule = value;
+            }
+        }
+        public string Numero
+        {
+            get { return this.m_numero; }
+            set
+            {
+                if (String.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                }
+                if (!this.m_formatNumero.IsMatch(value))
+                {
+                    throw new FormatException("Le numero ne correspond pas au format");
+                }
+
+                this.m_intitule = value;
+            }
+        }
+        public string? Description { get { return this.m_description; } set { this.m_description = value; } }
+        public string? Categorie { get { return this.m_categorie; } set { this.m_categorie = value; } }
         #endregion
 
         #region Methodes
+        private string LireFichierConfig()
+        {
+            string? config;
+
+            try
+            {
+                IConfigurationRoot configuration =
+                    new ConfigurationBuilder()
+                      .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
+                      .AddJsonFile("appsettings.json", false)
+                      .Build();
+
+                config = configuration["formatNumeroCours"];
+            }
+            catch (Exception)
+            {
+                config = null;
+            }
+
+            if (config is null)
+            {
+                config = "[0-9]{3}-[A-Z0-9]{3}-SF";
+            }
+
+            return config;
+        }
         public override bool Equals(object? obj)
         {
             return obj is Cours cours
