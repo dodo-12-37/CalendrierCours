@@ -62,18 +62,23 @@ namespace CalendrierCours.DAL.SiteInternet
             }
 
             List<string> lignesContenuInternet = CouperLignesTexte(contenuInternet);
+            List<CoursInternetDTO> listeCours = new List<CoursInternetDTO>();
             List<Cours> listeRetour = new List<Cours>();
 
             try
             {
-                listeRetour = this.TransformerLignesEnCoursInternetDTO(lignesContenuInternet)
-                    .Select(cDTO => cDTO.VersEntites())
-                    .ToList();
+                listeCours = this.TransformerLignesEnCoursInternetDTO(lignesContenuInternet);
             }
             catch (Exception e)
             {
                 throw new InvalidDepotException("Erreur dans l'interprétation du contenu du site", e);
             }
+
+            listeCours = this.ChangerIntitules(listeCours);
+
+            listeRetour = listeCours
+                .Select(cDTO => cDTO.VersEntites())
+                .ToList();
 
             return listeRetour;
         }
@@ -102,6 +107,22 @@ namespace CalendrierCours.DAL.SiteInternet
 
             return retour;
         }
+
+        private List<CoursInternetDTO> ChangerIntitules(List<CoursInternetDTO> p_liste)
+        {
+            Dictionary<string, string> listeCours = this.RecupererListeCours();
+
+            foreach (CoursInternetDTO c in p_liste)
+            {
+                if (listeCours.ContainsKey(c.Numero))
+                {
+                    c.Intitule = listeCours[c.Numero];
+                }
+            }
+
+            return p_liste;
+        }
+
         private List<string> CouperLignesTexte(string p_texte)
         {
             if (p_texte is null)
@@ -119,7 +140,7 @@ namespace CalendrierCours.DAL.SiteInternet
             string configHeures = "formatHeures", configMinutes = "formatMinutes", configSemaines = "formatSemaine";
             string configLigneCours = "formatLigneCours", configLigneVide = "formatLignevide", configHauteurCases = "formatHauteurCase";
 
-            Regex formatHeures = 
+            Regex formatHeures =
                 new Regex($"(?<{gpHeure}>{this.AffecterParametreDepuisFichierConfig(configHeures)})" +
                 $":(?<{gpMinute}>{this.AffecterParametreDepuisFichierConfig(configMinutes)})");
             Regex formatSemaines = new Regex($"(?<{gpSemaine}>{this.AffecterParametreDepuisFichierConfig(configSemaines)})");
@@ -231,6 +252,7 @@ namespace CalendrierCours.DAL.SiteInternet
 
             return nvCours;
         }
+
         private IConfigurationRoot LireFichierConfig()
         {
             IConfigurationRoot? configuration;
@@ -265,6 +287,31 @@ namespace CalendrierCours.DAL.SiteInternet
             if (retour is null)
             {
                 throw new Exception("Erreur dans la lecture du fichier de configuration");
+            }
+
+            return retour;
+        }
+        private Dictionary<string, string> RecupererListeCours()
+        {
+            Dictionary<string, string> retour = new Dictionary<string, string>();
+            string contenu;
+
+            string fichier = this.AffecterParametreDepuisFichierConfig("fichierListeCours");
+            string separateur = this.AffecterParametreDepuisFichierConfig("separateurListeCours");
+
+            if (File.Exists(fichier))
+            {
+                using (StreamReader sr = new StreamReader(fichier))
+                {
+                    contenu = sr.ReadToEnd();
+                }
+
+                List<string> contenuCoupe = this.CouperLignesTexte(contenu);
+                contenuCoupe.ForEach(l =>
+                {
+                    string[] infos = l.Split(separateur);
+                    retour.Add(infos[0], infos[1]);
+                });
             }
 
             return retour;
