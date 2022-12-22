@@ -16,4 +16,10 @@
     <ProjectReference Include="..\CalendrierCours.Entites\CalendrierCours.Entites.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ListeCours.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
