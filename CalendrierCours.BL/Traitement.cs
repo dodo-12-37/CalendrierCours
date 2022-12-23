@@ -22,10 +22,6 @@ namespace CalendrierCours.BL
         }
         #endregion
 
-        #region Proprietes
-
-        #endregion
-
         #region Methodes
         public void ExporterSeances(Cohorte p_cohorte, IExportFichier p_typeExport, string p_chemin, DateTime? p_date = null)
         {

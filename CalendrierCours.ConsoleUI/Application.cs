@@ -31,10 +31,6 @@ namespace CalendrierCours.ConsoleUI
         }
         #endregion
 
-        #region Proprietes
-
-        #endregion
-
         #region Methodes
         public void Run()
         {
