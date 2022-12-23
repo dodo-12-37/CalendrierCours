@@ -1,6 +1,5 @@
 ﻿using CalendrierCours.Entites;
 using Microsoft.Extensions.Configuration;
-using System.Globalization;
 using System.Text;
 
 namespace CalendrierCours.DAL.ExportCoursICS

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace CalendrierCours.Entites
@@ -234,7 +233,7 @@ namespace CalendrierCours.Entites
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(Enseignant, Intitule);
+            return HashCode.Combine(Enseignant, Intitule, Numero);
         }
         #endregion
     }
@@ -244,10 +243,11 @@ namespace CalendrierCours.Entites
         private DateTime m_dateDebut;
         private DateTime m_dateFin;
         private string m_salle;
+        private Guid m_uid;
         #endregion
 
         #region Ctor
-        public Seance(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
+        public Seance(DateTime p_dateDebut, DateTime p_dateFin, string p_salle, Guid p_uid)
         {
             if (p_dateDebut >= p_dateFin)
             {
@@ -256,6 +256,15 @@ namespace CalendrierCours.Entites
             if (String.IsNullOrWhiteSpace(p_salle))
             {
                 throw new ArgumentNullException("Ne doit pas etre null ou vide");
+            }
+
+            if (p_uid == Guid.Empty)
+            {
+                this.m_uid = Guid.NewGuid();
+            }
+            else
+            {
+                this.m_uid = p_uid;
             }
 
             this.m_dateDebut = p_dateDebut;
@@ -304,19 +313,21 @@ namespace CalendrierCours.Entites
                 this.m_salle = value;
             }
         }
+        public Guid UID { get { return this.m_uid; } }
         #endregion
 
         #region Methodes
         public override bool Equals(object? obj)
         {
             return obj is Seance seance
+                && seance.UID == this.UID
                 && seance.DateDebut == this.DateDebut
                 && seance.DateFin == this.DateFin
                 && seance.Salle == this.Salle;
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(m_dateDebut, m_dateFin, m_salle);
+            return HashCode.Combine(m_uid, m_dateDebut, m_dateFin, m_salle);
         }
         #endregion
     }

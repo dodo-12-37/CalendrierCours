@@ -1,5 +1,4 @@
-﻿using CalendrierCours.DAL.SiteInternet;
-using CalendrierCours.Entites;
+﻿using CalendrierCours.Entites;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
 using System.Text;
@@ -108,7 +107,8 @@ namespace CalendrierCours.ConsoleUI
         public CoursViewModelConsole(ProfesseurViewModelConsole p_enseignant, string p_numero, string p_intitule)
             : this(p_enseignant, p_numero, p_intitule, new List<SeanceViewModelConsole>())
         { }
-        public CoursViewModelConsole(ProfesseurViewModelConsole p_enseignant, string p_numero, string p_intitule, List<SeanceViewModelConsole> p_seances)
+        public CoursViewModelConsole(ProfesseurViewModelConsole p_enseignant, string p_numero, string p_intitule
+            , List<SeanceViewModelConsole> p_seances)
         {
             if (p_enseignant is null)
             {
@@ -135,7 +135,8 @@ namespace CalendrierCours.ConsoleUI
             this.m_numero = p_numero;
         }
         public CoursViewModelConsole(Cours p_cours)
-            : this(new ProfesseurViewModelConsole(p_cours.Enseignant), p_cours.Numero, p_cours.Intitule, p_cours.Seances.Select(s => new SeanceViewModelConsole(s)).ToList())
+            : this(new ProfesseurViewModelConsole(p_cours.Enseignant), p_cours.Numero, p_cours.Intitule
+                  , p_cours.Seances.Select(s => new SeanceViewModelConsole(s)).ToList())
         { }
         #endregion
 
@@ -230,7 +231,7 @@ namespace CalendrierCours.ConsoleUI
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(Enseignant, Intitule);
+            return HashCode.Combine(Enseignant, Intitule, Numero);
         }
 
         private IConfigurationRoot LireFichierConfig()
@@ -279,10 +280,11 @@ namespace CalendrierCours.ConsoleUI
         private DateTime m_dateDebut;
         private DateTime m_dateFin;
         private string m_salle;
+        private Guid m_uid;
         #endregion
 
         #region Ctor
-        public SeanceViewModelConsole(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
+        public SeanceViewModelConsole(DateTime p_dateDebut, DateTime p_dateFin, string p_salle, Guid p_uid)
         {
             if (p_dateDebut >= p_dateFin)
             {
@@ -293,11 +295,21 @@ namespace CalendrierCours.ConsoleUI
                 throw new ArgumentNullException("Ne doit pas etre null ou vide");
             }
 
+            if (p_uid == Guid.Empty)
+            {
+                this.m_uid = Guid.NewGuid();
+            }
+            else
+            {
+                this.m_uid = p_uid;
+            }
+
             this.m_dateDebut = p_dateDebut;
             this.m_dateFin = p_dateFin;
             this.m_salle = p_salle;
         }
-        public SeanceViewModelConsole(Seance p_seance) : this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle) { }
+        public SeanceViewModelConsole(Seance p_seance) : 
+            this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle, p_seance.UID) { }
         #endregion
 
         #region Proprietes
@@ -340,12 +352,13 @@ namespace CalendrierCours.ConsoleUI
                 this.m_salle = value;
             }
         }
+        public Guid UID { get { return this.m_uid; } }
         #endregion
 
         #region Methodes
         public Seance VersEntite()
         {
-            return new Seance(this.m_dateDebut, this.m_dateFin, this.m_salle);
+            return new Seance(this.m_dateDebut, this.m_dateFin, this.m_salle, this.m_uid);
         }
         public override string ToString()
         {
@@ -361,13 +374,14 @@ namespace CalendrierCours.ConsoleUI
         public override bool Equals(object? obj)
         {
             return obj is SeanceViewModelConsole seance
+                && seance.UID == this.UID
                 && seance.DateDebut == this.DateDebut
                 && seance.DateFin == this.DateFin
                 && seance.Salle == this.Salle;
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(m_dateDebut, m_dateFin, m_salle);
+            return HashCode.Combine(this.m_uid, this.m_dateDebut, this.m_dateFin, this.m_salle);
         }
         #endregion
     }

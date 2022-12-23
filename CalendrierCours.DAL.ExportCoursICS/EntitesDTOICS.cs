@@ -1,6 +1,5 @@
 ﻿using CalendrierCours.Entites;
 using Microsoft.Extensions.Configuration;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace CalendrierCours.DAL.ExportCoursICS
@@ -18,10 +17,10 @@ namespace CalendrierCours.DAL.ExportCoursICS
 
         #region Ctor
         public CoursICSDTO(ProfesseurICSDTO p_enseignant, string p_numero, string p_intitule)
-            : this(p_enseignant, p_numero, p_intitule, null, null, new List<SeanceICSDTO>())
-        { }
+            : this(p_enseignant, p_numero, p_intitule, null, null, new List<SeanceICSDTO>()) { }
         public CoursICSDTO
-            (ProfesseurICSDTO p_enseignant, string p_numero, string p_intitule, string? p_description, string? p_categorie, List<SeanceICSDTO> p_seances)
+            (ProfesseurICSDTO p_enseignant, string p_numero, string p_intitule
+            , string? p_description, string? p_categorie, List<SeanceICSDTO> p_seances)
         {
             if (p_enseignant is null)
             {
@@ -55,8 +54,7 @@ namespace CalendrierCours.DAL.ExportCoursICS
             this.m_description = p_description;
         }
         public CoursICSDTO(Cours p_cours)
-            : this(
-                  new ProfesseurICSDTO(p_cours.Enseignant)
+            : this(new ProfesseurICSDTO(p_cours.Enseignant)
                   , p_cours.Numero
                   , p_cours.Intitule
                   , p_cours.Description
@@ -147,7 +145,7 @@ namespace CalendrierCours.DAL.ExportCoursICS
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(Enseignant, Intitule);
+            return HashCode.Combine(Enseignant, Intitule, Numero);
         }
 
         private IConfigurationRoot LireFichierConfig()
@@ -200,7 +198,7 @@ namespace CalendrierCours.DAL.ExportCoursICS
         #endregion
 
         #region Ctor
-        public SeanceICSDTO(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
+        public SeanceICSDTO(DateTime p_dateDebut, DateTime p_dateFin, string p_salle, Guid p_uid)
         {
             if (p_dateDebut >= p_dateFin)
             {
@@ -211,12 +209,21 @@ namespace CalendrierCours.DAL.ExportCoursICS
                 throw new ArgumentNullException("Ne doit pas etre null ou vide");
             }
 
+            if (p_uid == Guid.Empty)
+            {
+                this.m_uid = Guid.NewGuid();
+            }
+            else
+            {
+                this.m_uid = p_uid;
+            }
+
             this.m_dateDebut = p_dateDebut;
             this.m_dateFin = p_dateFin;
             this.m_salle = p_salle;
-            this.m_uid = Guid.NewGuid();
+            this.m_uid = p_uid;
         }
-        public SeanceICSDTO(Seance p_seance) : this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle) { }
+        public SeanceICSDTO(Seance p_seance) : this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle, p_seance.UID) { }
         #endregion
 
         #region Proprietes
@@ -265,18 +272,19 @@ namespace CalendrierCours.DAL.ExportCoursICS
         #region Methodes
         public Seance VersEntite()
         {
-            return new Seance(this.m_dateDebut, this.m_dateFin, this.m_salle);
+            return new Seance(this.m_dateDebut, this.m_dateFin, this.m_salle, this.m_uid);
         }
         public override bool Equals(object? obj)
         {
             return obj is SeanceICSDTO seance
+                && seance.UID == this.UID
                 && seance.DateDebut == this.DateDebut
                 && seance.DateFin == this.DateFin
                 && seance.Salle == this.Salle;
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(m_dateDebut, m_dateFin, m_salle);
+            return HashCode.Combine(m_uid, m_dateDebut, m_dateFin, m_salle);
         }
         #endregion
     }

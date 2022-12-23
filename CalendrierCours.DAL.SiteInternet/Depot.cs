@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Text.RegularExpressions;
 using CalendrierCours.Entites;
 using Microsoft.Extensions.Configuration;
@@ -63,7 +62,6 @@ namespace CalendrierCours.DAL.SiteInternet
 
             List<string> lignesContenuInternet = CouperLignesTexte(contenuInternet);
             List<CoursInternetDTO> listeCours = new List<CoursInternetDTO>();
-            List<Cours> listeRetour = new List<Cours>();
 
             try
             {
@@ -76,11 +74,9 @@ namespace CalendrierCours.DAL.SiteInternet
 
             listeCours = this.ChangerIntitules(listeCours);
 
-            listeRetour = listeCours
+            return listeCours
                 .Select(cDTO => cDTO.VersEntites())
                 .ToList();
-
-            return listeRetour;
         }
         private string? RecupererContenuSite(string? p_url = null)
         {
@@ -235,7 +231,7 @@ namespace CalendrierCours.DAL.SiteInternet
 
             string[] professeur = infos[positionProf].Split(", ");
 
-            ProfesseurInternetDTO nvProf = null;
+            ProfesseurInternetDTO nvProf;
 
             if (professeur.Length == 2)
             {
@@ -247,7 +243,7 @@ namespace CalendrierCours.DAL.SiteInternet
             }
 
             CoursInternetDTO nvCours = new CoursInternetDTO(nvProf, numeroCours, intituleCours);
-            SeanceInternetDTO nvSeance = new SeanceInternetDTO(p_dateDebut, p_dateFin, infos[positionSalle]);
+            SeanceInternetDTO nvSeance = new SeanceInternetDTO(p_dateDebut, p_dateFin, infos[positionSalle], Guid.NewGuid());
             nvCours.Seances.Add(nvSeance);
 
             return nvCours;

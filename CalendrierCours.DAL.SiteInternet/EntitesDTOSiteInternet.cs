@@ -246,7 +246,7 @@ namespace CalendrierCours.DAL.SiteInternet
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(Enseignant, Intitule);
+            return HashCode.Combine(Enseignant, Intitule, Numero);
         }
         #endregion
     }
@@ -256,10 +256,11 @@ namespace CalendrierCours.DAL.SiteInternet
         private DateTime m_dateDebut;
         private DateTime m_dateFin;
         private string m_salle;
+        private Guid m_uid;
         #endregion
 
         #region Ctor
-        public SeanceInternetDTO(DateTime p_dateDebut, DateTime p_dateFin, string p_salle)
+        public SeanceInternetDTO(DateTime p_dateDebut, DateTime p_dateFin, string p_salle, Guid p_uid)
         {
             if (p_dateDebut >= p_dateFin)
             {
@@ -270,11 +271,20 @@ namespace CalendrierCours.DAL.SiteInternet
                 throw new ArgumentNullException("Ne doit pas etre null ou vide");
             }
 
+            if (p_uid == Guid.Empty)
+            {
+                this.m_uid = Guid.NewGuid();
+            }
+            else
+            {
+                this.m_uid = p_uid;
+            }
+
             this.m_dateDebut = p_dateDebut;
             this.m_dateFin = p_dateFin;
             this.m_salle = p_salle;
         }
-        public SeanceInternetDTO(Seance p_seance) : this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle) { }
+        public SeanceInternetDTO(Seance p_seance) : this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle, p_seance.UID) { }
         #endregion
 
         #region Proprietes
@@ -317,23 +327,25 @@ namespace CalendrierCours.DAL.SiteInternet
                 this.m_salle = value;
             }
         }
+        public Guid UID { get { return this.m_uid; } }
         #endregion
 
         #region Methodes
         public Seance VersEntite()
         {
-            return new Seance(this.m_dateDebut, this.m_dateFin, this.m_salle);
+            return new Seance(this.m_dateDebut, this.m_dateFin, this.m_salle, this.m_uid);
         }
         public override bool Equals(object? obj)
         {
             return obj is SeanceInternetDTO seance
+                && seance.UID == this.UID
                 && seance.DateDebut == this.DateDebut
                 && seance.DateFin == this.DateFin
                 && seance.Salle == this.Salle;
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(m_dateDebut, m_dateFin, m_salle);
+            return HashCode.Combine(m_uid, m_dateDebut, m_dateFin, m_salle);
         }
         #endregion
     }
