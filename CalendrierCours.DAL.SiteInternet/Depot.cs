@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using System.Text.RegularExpressions;
 using CalendrierCours.Entites;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +10,20 @@ namespace CalendrierCours.DAL.SiteInternet
         : IDepotCours
     {
         #region Membres
+        private const string PROPRIETE_URL_SITE_INTERNET = "urlSiteInternet";
+        private const string PROPRIETE_URL_SITE_AVEC_COHORTE = "urlAvecCohorte";
+        private const string PROPRIETE_FORMAT_LISTE_COHORTE = "formatListeCohorte";
+        private const string PROPRIETE_FORMAT_NUMERO_COURS = "formatNumeroCours";
+        private const string PROPRIETE_FORMAT_HAUTEUR_CASE = "formatHauteurCase";
+        private const string PROPRIETE_FORMAT_HEURES = "formatHeures";
+        private const string PROPRIETE_FORMAT_MINUTES = "formatMinutes";
+        private const string PROPRIETE_FORMAT_SEMAINE = "formatSemaine";
+        private const string PROPRIETE_FORMAT_LIGNE_COURS = "formatLigneCours";
+        private const string PROPRIETE_FORMAT_LIGNE_VIDE = "formatLignevide";
+        private const string PROPRIETE_FORMAT_LIGNE_SEANCE = "formatLigneSeance";
+        private const string PROPRIETE_FICHIER_LISTE_COURS = "fichierListeCours";
+        private const string PROPRIETE_SEPARATEUR_LISTE_COURS = "separateurListeCours";
+
         private string m_urlSiteCsfoy;
         private string m_urlSiteCsfoyCohorte;
         #endregion
@@ -18,8 +33,8 @@ namespace CalendrierCours.DAL.SiteInternet
         {
             IConfigurationRoot configuration = this.LireFichierConfig();
 
-            this.m_urlSiteCsfoy = this.AffecterParametreDepuisFichierConfig("urlSiteInternet");
-            this.m_urlSiteCsfoyCohorte = this.AffecterParametreDepuisFichierConfig("urlAvecCohorte");
+            this.m_urlSiteCsfoy = this.AffecterParametreDepuisFichierConfig(PROPRIETE_URL_SITE_INTERNET);
+            this.m_urlSiteCsfoyCohorte = this.AffecterParametreDepuisFichierConfig(PROPRIETE_URL_SITE_AVEC_COHORTE);
         }
         #endregion
 
@@ -37,7 +52,7 @@ namespace CalendrierCours.DAL.SiteInternet
             List<Cohorte> listeRetour = new List<Cohorte>();
 
             listeRetour = lignesContenuInternet
-                .Where(str => str.Contains(this.AffecterParametreDepuisFichierConfig("formatListeCohorte")))
+                .Where(str => str.Contains(this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_LISTE_COHORTE)))
                 .Select(str =>
                 {
                     string[] valeurs = str.Split("\"");
@@ -133,16 +148,14 @@ namespace CalendrierCours.DAL.SiteInternet
             List<CoursInternetDTO> listeRetour = new List<CoursInternetDTO>();
 
             string gpHeure = "h", gpMinute = "m", gpSemaine = "s", gpTaille = "t";
-            string configHeures = "formatHeures", configMinutes = "formatMinutes", configSemaines = "formatSemaine";
-            string configLigneCours = "formatLigneCours", configLigneVide = "formatLignevide", configHauteurCases = "formatHauteurCase";
 
             Regex formatHeures =
-                new Regex($"(?<{gpHeure}>{this.AffecterParametreDepuisFichierConfig(configHeures)})" +
-                $":(?<{gpMinute}>{this.AffecterParametreDepuisFichierConfig(configMinutes)})");
-            Regex formatSemaines = new Regex($"(?<{gpSemaine}>{this.AffecterParametreDepuisFichierConfig(configSemaines)})");
-            Regex formatLigneCours = new Regex(this.AffecterParametreDepuisFichierConfig(configLigneCours));
-            Regex formatLigneVide = new Regex(this.AffecterParametreDepuisFichierConfig(configLigneVide));
-            Regex formatHauteurCase = new Regex($"(?<{gpTaille}>{this.AffecterParametreDepuisFichierConfig(configHauteurCases)})px");
+                new Regex($"(?<{gpHeure}>{this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_HEURES)})" +
+                $":(?<{gpMinute}>{this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_MINUTES)})");
+            Regex formatSemaines = new Regex($"(?<{gpSemaine}>{this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_SEMAINE)})");
+            Regex formatLigneCours = new Regex(this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_LIGNE_COURS));
+            Regex formatLigneVide = new Regex(this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_LIGNE_VIDE));
+            Regex formatHauteurCase = new Regex($"(?<{gpTaille}>{this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_HAUTEUR_CASE)})px");
 
             int compteurHeure = -1;
             int tailleHeure = -1;
@@ -215,10 +228,9 @@ namespace CalendrierCours.DAL.SiteInternet
         private CoursInternetDTO TransformerLigneNouvelleSeance(string p_ligne, DateTime p_dateDebut, DateTime p_dateFin)
         {
             string gpInfos = "i", gpNumero = "n";
-            string configSeance = "formatLigneSeance", configNumero = "formatNumeroCours";
 
-            Regex regexSeance = new Regex($"(?<{gpInfos}>{this.AffecterParametreDepuisFichierConfig(configSeance)})");
-            Regex regexNumeroCours = new Regex($"(?<{gpNumero}>{this.AffecterParametreDepuisFichierConfig(configNumero)})");
+            Regex regexSeance = new Regex($"(?<{gpInfos}>{this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_LIGNE_SEANCE)})");
+            Regex regexNumeroCours = new Regex($"(?<{gpNumero}>{this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_NUMERO_COURS)})");
             int positionIntitule = 0, positionNumero = 1, positionProf = 2, positionSalle = 3;
             int PositionNomProf = 0, positionPrenomProf = 1;
 
@@ -292,8 +304,8 @@ namespace CalendrierCours.DAL.SiteInternet
             Dictionary<string, string> retour = new Dictionary<string, string>();
             string contenu;
 
-            string fichier = this.AffecterParametreDepuisFichierConfig("fichierListeCours");
-            string separateur = this.AffecterParametreDepuisFichierConfig("separateurListeCours");
+            string fichier = this.AffecterParametreDepuisFichierConfig(PROPRIETE_FICHIER_LISTE_COURS);
+            string separateur = this.AffecterParametreDepuisFichierConfig(PROPRIETE_SEPARATEUR_LISTE_COURS);
 
             if (File.Exists(fichier))
             {
