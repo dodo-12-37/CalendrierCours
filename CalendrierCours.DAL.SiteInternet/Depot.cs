@@ -1,8 +1,6 @@
-﻿using System.Globalization;
-using System.Net;
+﻿using System.Net;
 using System.Text.RegularExpressions;
 using CalendrierCours.Entites;
-using Microsoft.Extensions.Configuration;
 
 namespace CalendrierCours.DAL.SiteInternet
 {

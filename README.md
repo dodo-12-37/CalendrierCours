@@ -14,6 +14,6 @@ Application servant à récupérer les informations des séances de cours des di
  - Possibilité d'exporter tous les cours d'une cohorte ou seulement un cours
  - <strong>En cours</strong> Possibilité d'exporter plusieurs cours choisis
  - <strong>En cours</strong> Application winform
- - Exporation au format vcs
+ - Exporation au format ICS
  - <strong>En cours</strong> Optimisation de l'existant
  - <strong>En cours</strong> Possibilité de récupérer l'ensemble des cohortes

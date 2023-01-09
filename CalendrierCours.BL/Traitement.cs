@@ -1,5 +1,4 @@
 ﻿using CalendrierCours.Entites;
-using System.Net;
 using System.Text.RegularExpressions;
 
 namespace CalendrierCours.BL
