@@ -24,17 +24,24 @@ namespace CalendrierCours.DAL.SiteInternet
         private const string PROPRIETE_FICHIER_LISTE_COURS = "fichierListeCours";
         private const string PROPRIETE_SEPARATEUR_LISTE_COURS = "separateurListeCours";
 
+        private IProprietes m_proprietes;
+
         private string m_urlSiteCsfoy;
         private string m_urlSiteCsfoyCohorte;
         #endregion
 
         #region Ctor
-        public DepotSiteInternet()
+        public DepotSiteInternet(IProprietes p_proprietes)
         {
-            IConfigurationRoot configuration = this.LireFichierConfig();
+            if (p_proprietes is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_proprietes));
+            }
 
-            this.m_urlSiteCsfoy = this.AffecterParametreDepuisFichierConfig(PROPRIETE_URL_SITE_INTERNET);
-            this.m_urlSiteCsfoyCohorte = this.AffecterParametreDepuisFichierConfig(PROPRIETE_URL_SITE_AVEC_COHORTE);
+            this.m_proprietes = p_proprietes;
+
+            this.m_urlSiteCsfoy = this.m_proprietes[PROPRIETE_URL_SITE_INTERNET];
+            this.m_urlSiteCsfoyCohorte = this.m_proprietes[PROPRIETE_URL_SITE_AVEC_COHORTE];
         }
         #endregion
 
@@ -52,7 +59,7 @@ namespace CalendrierCours.DAL.SiteInternet
             List<Cohorte> listeRetour = new List<Cohorte>();
 
             listeRetour = lignesContenuInternet
-                .Where(str => str.Contains(this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_LISTE_COHORTE)))
+                .Where(str => str.Contains(this.m_proprietes[PROPRIETE_FORMAT_LISTE_COHORTE]))
                 .Select(str =>
                 {
                     string[] valeurs = str.Split("\"");
@@ -150,12 +157,12 @@ namespace CalendrierCours.DAL.SiteInternet
             string gpHeure = "h", gpMinute = "m", gpSemaine = "s", gpTaille = "t";
 
             Regex formatHeures =
-                new Regex($"(?<{gpHeure}>{this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_HEURES)})" +
-                $":(?<{gpMinute}>{this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_MINUTES)})");
-            Regex formatSemaines = new Regex($"(?<{gpSemaine}>{this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_SEMAINE)})");
-            Regex formatLigneCours = new Regex(this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_LIGNE_COURS));
-            Regex formatLigneVide = new Regex(this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_LIGNE_VIDE));
-            Regex formatHauteurCase = new Regex($"(?<{gpTaille}>{this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_HAUTEUR_CASE)})px");
+                new Regex($"(?<{gpHeure}>{this.m_proprietes[PROPRIETE_FORMAT_HEURES]})" +
+                $":(?<{gpMinute}>{this.m_proprietes[PROPRIETE_FORMAT_MINUTES]})");
+            Regex formatSemaines = new Regex($"(?<{gpSemaine}>{this.m_proprietes[PROPRIETE_FORMAT_SEMAINE]})");
+            Regex formatLigneCours = new Regex(this.m_proprietes[PROPRIETE_FORMAT_LIGNE_COURS]);
+            Regex formatLigneVide = new Regex(this.m_proprietes[PROPRIETE_FORMAT_LIGNE_VIDE]);
+            Regex formatHauteurCase = new Regex($"(?<{gpTaille}>{this.m_proprietes[PROPRIETE_FORMAT_HAUTEUR_CASE]})px");
 
             int compteurHeure = -1;
             int tailleHeure = -1;
@@ -229,8 +236,8 @@ namespace CalendrierCours.DAL.SiteInternet
         {
             string gpInfos = "i", gpNumero = "n";
 
-            Regex regexSeance = new Regex($"(?<{gpInfos}>{this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_LIGNE_SEANCE)})");
-            Regex regexNumeroCours = new Regex($"(?<{gpNumero}>{this.AffecterParametreDepuisFichierConfig(PROPRIETE_FORMAT_NUMERO_COURS)})");
+            Regex regexSeance = new Regex($"(?<{gpInfos}>{this.m_proprietes[PROPRIETE_FORMAT_LIGNE_SEANCE]})");
+            Regex regexNumeroCours = new Regex($"(?<{gpNumero}>{this.m_proprietes[PROPRIETE_FORMAT_NUMERO_COURS]})");
             int positionIntitule = 0, positionNumero = 1, positionProf = 2, positionSalle = 3;
             int PositionNomProf = 0, positionPrenomProf = 1;
 
@@ -261,51 +268,13 @@ namespace CalendrierCours.DAL.SiteInternet
             return nvCours;
         }
 
-        private IConfigurationRoot LireFichierConfig()
-        {
-            IConfigurationRoot? configuration;
-
-            try
-            {
-                configuration =
-                    new ConfigurationBuilder()
-                      .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
-                      .AddJsonFile("appsettings.json", false)
-                      .Build();
-            }
-            catch (Exception e)
-            {
-                throw new InvalidDepotException("Le fichier de configuration est corrompu", e);
-            }
-
-            return configuration;
-        }
-        private string AffecterParametreDepuisFichierConfig(string p_nomParametre)
-        {
-            string? retour;
-            IConfigurationRoot configuration = this.LireFichierConfig();
-
-            if (configuration is null)
-            {
-                throw new Exception("Erreur dans la lecture du fichier de configuration");
-            }
-
-            retour = configuration[p_nomParametre];
-
-            if (retour is null)
-            {
-                throw new Exception("Erreur dans la lecture du fichier de configuration");
-            }
-
-            return retour;
-        }
         private Dictionary<string, string> RecupererListeCours()
         {
             Dictionary<string, string> retour = new Dictionary<string, string>();
             string contenu;
 
-            string fichier = this.AffecterParametreDepuisFichierConfig(PROPRIETE_FICHIER_LISTE_COURS);
-            string separateur = this.AffecterParametreDepuisFichierConfig(PROPRIETE_SEPARATEUR_LISTE_COURS);
+            string fichier = this.m_proprietes[PROPRIETE_FICHIER_LISTE_COURS];
+            string separateur = this.m_proprietes[PROPRIETE_SEPARATEUR_LISTE_COURS];
 
             if (File.Exists(fichier))
             {

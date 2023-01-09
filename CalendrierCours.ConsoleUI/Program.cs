@@ -13,17 +13,20 @@ public class Program
         UtilitaireDepotCours utilitaireDepot = new UtilitaireDepotCours();
         UtilitaireExportCours utilitaireExport = new UtilitaireExportCours();
 
+        SinglotonProprietes proprietes = null;
         Application application = null;
         bool estInitialise = false;
 
         try
         {
+            Console.Out.WriteLine("Initialisation des proprietes...");
+            proprietes = new SinglotonProprietes();
             Console.Out.WriteLine("Initialisation du dépot...");
-            DepotSiteInternet depot = utilitaireDepot.CreerDepot() as DepotSiteInternet;
+            DepotSiteInternet depot = utilitaireDepot.CreerDepot(proprietes) as DepotSiteInternet;
             Console.Out.WriteLine("Initialisation du traitement...");
             Traitement traitement = new Traitement(depot);
             Console.Out.WriteLine("Initialisation de l'application...");
-            application = new Application(traitement);
+            application = new Application(traitement, proprietes);
             Console.Out.WriteLine("Initialisation terminée avec succès !");
             estInitialise = true;
         }
@@ -67,9 +70,9 @@ public class UtilitaireDepotCours
         return traitements.Select(t => new CreateurDepot() { Type = t });
     }
 
-    public IDepotCours CreerDepot()
+    public IDepotCours CreerDepot(IProprietes p_proprietes)
     {
-        return new DepotSiteInternet();
+        return new DepotSiteInternet(p_proprietes);
     }
 }
 public class CreateurDepot
@@ -102,7 +105,7 @@ public class UtilitaireExportCours
     public IDepotCours CreerDepot()
     {
         throw new NotImplementedException();
-        return new DepotSiteInternet();
+        //return new DepotSiteInternet();
     }
 }
 public class CreateurExport

@@ -7,6 +7,8 @@ namespace CalendrierCours.ConsoleUI
     public class Application
     {
         #region Membres
+        private IProprietes m_proprietes;
+
         private Traitement m_traitement;
         private List<CohorteViewModelConsole> m_cohortes;
         private CohorteViewModelConsole m_cohorteActive;
@@ -15,13 +17,18 @@ namespace CalendrierCours.ConsoleUI
         #endregion
 
         #region Ctor
-        public Application(Traitement p_traitement)
+        public Application(Traitement p_traitement, IProprietes p_proprietes)
         {
             if (p_traitement is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_traitement));
             }
+            if (p_proprietes is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_proprietes));
+            }
 
+            this.m_proprietes = p_proprietes;
             this.m_traitement = p_traitement;
             this.m_cohortes = this.m_traitement.ListerCohorte()
                 .Select(c => new CohorteViewModelConsole(c))
@@ -392,7 +399,7 @@ namespace CalendrierCours.ConsoleUI
         }
         private IExportFichier RecupererObjetExport(int p_index)
         {
-            return new ExportCoursICS();
+            return new ExportCoursICS(this.m_proprietes);
         }
 
         private bool MiseAJoursCohorteActiveDepuisTraitement()

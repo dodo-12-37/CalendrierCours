@@ -11,6 +11,18 @@ namespace CalendrierCours.DAL.ExportCoursICS
         private const string PROPRIETE_VTIMEZONE = "TZID";
         private const string PROPRIETE_LANGAGE = "LANGUAGE";
 
+        private IProprietes m_proprietes;
+
+        public ExportCoursICS(IProprietes p_proprietes)
+        {
+            if (p_proprietes is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_proprietes));
+            }
+
+            m_proprietes = p_proprietes;
+        }
+
         public void ExporterVersFichier(List<Cours> p_cours, string p_chemin)
         {
             if (p_cours is null)
@@ -64,7 +76,7 @@ namespace CalendrierCours.DAL.ExportCoursICS
             sb.AppendLine("BEGIN:VCALENDAR");
             sb.AppendLine("VERSION:2.0");
             sb.AppendLine("BEGIN:VTIMEZONE");
-            sb.AppendLine($"TZID:{this.AffecterParametreDepuisFichierConfig(PROPRIETE_VTIMEZONE)}");
+            sb.AppendLine($"TZID:{this.m_proprietes[PROPRIETE_VTIMEZONE]}");
             sb.AppendLine("END:VTIMEZONE");
 
             return sb.ToString();
@@ -82,10 +94,10 @@ namespace CalendrierCours.DAL.ExportCoursICS
                 sb.AppendLine($"CATEGORIES:{p_cours.Categorie}");
             }
 
-            sb.Append($"DTSTART;TZID=\"{this.AffecterParametreDepuisFichierConfig(PROPRIETE_VTIMEZONE)}\":");
+            sb.Append($"DTSTART;TZID=\"{this.m_proprietes[PROPRIETE_VTIMEZONE]}\":");
             sb.Append($"{dateDebut.ToString("yyyyMMdd")}T");
             sb.AppendLine($"{dateDebut.ToString("HHmmss")}");
-            sb.Append($"DTEND;TZID=\"{this.AffecterParametreDepuisFichierConfig(PROPRIETE_VTIMEZONE)}\":");
+            sb.Append($"DTEND;TZID=\"{this.m_proprietes[PROPRIETE_VTIMEZONE]}\":");
             sb.Append($"{dateFin.ToString("yyyyMMdd")}T");
             sb.AppendLine($"{dateFin.ToString("HHmmss")}");
             sb.AppendLine($"LOCATION:{p_seance.Salle}");
@@ -101,7 +113,7 @@ namespace CalendrierCours.DAL.ExportCoursICS
                 sb.AppendLine();
             }
 
-            sb.AppendLine($"SUMMARY;LANGUAGE={this.AffecterParametreDepuisFichierConfig(PROPRIETE_LANGAGE)}:{p_cours.Numero} - {p_cours.Intitule}");
+            sb.AppendLine($"SUMMARY;LANGUAGE={this.m_proprietes[PROPRIETE_LANGAGE]}:{p_cours.Numero} - {p_cours.Intitule}");
             sb.AppendLine($"UID:{p_seance.UID.ToString()}");
             sb.AppendLine($"END:VEVENT");
 
@@ -123,45 +135,6 @@ namespace CalendrierCours.DAL.ExportCoursICS
                     throw;
                 }
             }
-        }
-
-        private IConfigurationRoot LireFichierConfig()
-        {
-            IConfigurationRoot? configuration;
-
-            try
-            {
-                configuration =
-                    new ConfigurationBuilder()
-                      .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
-                      .AddJsonFile("appsettings.json", false)
-                      .Build();
-            }
-            catch (Exception e)
-            {
-                throw new InvalidDepotException("Le fichier de configuration est corrompu", e);
-            }
-
-            return configuration;
-        }
-        private string AffecterParametreDepuisFichierConfig(string p_nomParametre)
-        {
-            string? retour;
-            IConfigurationRoot configuration = this.LireFichierConfig();
-
-            if (configuration is null)
-            {
-                throw new Exception("Erreur dans la lecture du fichier de configuration");
-            }
-
-            retour = configuration[p_nomParametre];
-
-            if (retour is null)
-            {
-                throw new Exception("Erreur dans la lecture du fichier de configuration");
-            }
-
-            return retour;
         }
     }
 }

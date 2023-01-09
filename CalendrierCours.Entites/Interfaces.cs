@@ -1,4 +1,6 @@
-﻿namespace CalendrierCours.Entites
+﻿using System.Globalization;
+
+namespace CalendrierCours.Entites
 {
     public interface IExportFichier
     {
@@ -11,8 +13,8 @@
         List<Cours> RecupererCours(Cohorte p_cohorte);
     }
 
-    public interface IProprietes 
+    public interface IProprietes
     {
-        string RecupererPropriete(string p_nomPropriete);
+        string this[string p_nomPropriete] {get; }
     }
 }
