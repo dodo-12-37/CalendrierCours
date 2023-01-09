@@ -15,6 +15,7 @@ namespace CalendrierCours.DAL.SiteInternet
         private const string PROPRIETE_FORMAT_LISTE_COHORTE = "formatListeCohorte";
         private const string PROPRIETE_FORMAT_NUMERO_COURS = "formatNumeroCours";
         private const string PROPRIETE_FORMAT_HAUTEUR_CASE = "formatHauteurCase";
+        private const string PROPRIETE_FORMAT_SEPARATEUR_HEURE = "formatSeparateurHeure";
         private const string PROPRIETE_FORMAT_HEURES = "formatHeures";
         private const string PROPRIETE_FORMAT_MINUTES = "formatMinutes";
         private const string PROPRIETE_FORMAT_SEMAINE = "formatSemaine";
@@ -158,7 +159,7 @@ namespace CalendrierCours.DAL.SiteInternet
 
             Regex formatHeures =
                 new Regex($"(?<{gpHeure}>{this.m_proprietes[PROPRIETE_FORMAT_HEURES]})" +
-                $":(?<{gpMinute}>{this.m_proprietes[PROPRIETE_FORMAT_MINUTES]})");
+                $"{this.m_proprietes[PROPRIETE_FORMAT_SEPARATEUR_HEURE]}(?<{gpMinute}>{this.m_proprietes[PROPRIETE_FORMAT_MINUTES]})");
             Regex formatSemaines = new Regex($"(?<{gpSemaine}>{this.m_proprietes[PROPRIETE_FORMAT_SEMAINE]})");
             Regex formatLigneCours = new Regex(this.m_proprietes[PROPRIETE_FORMAT_LIGNE_COURS]);
             Regex formatLigneVide = new Regex(this.m_proprietes[PROPRIETE_FORMAT_LIGNE_VIDE]);
