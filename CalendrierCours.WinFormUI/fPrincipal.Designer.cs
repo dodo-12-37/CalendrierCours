@@ -39,7 +39,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.bExportTousLesCours = new System.Windows.Forms.Button();
-            this.lConfirmation = new System.Windows.Forms.Label();
+            this.lInformation = new System.Windows.Forms.Label();
             this.tbCategorie = new System.Windows.Forms.TextBox();
             this.bExportCours = new System.Windows.Forms.Button();
             this.lCategorie = new System.Windows.Forms.Label();
@@ -152,7 +152,7 @@
             this.panel2.BackColor = System.Drawing.Color.Gainsboro;
             this.panel2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.panel2.Controls.Add(this.bExportTousLesCours);
-            this.panel2.Controls.Add(this.lConfirmation);
+            this.panel2.Controls.Add(this.lInformation);
             this.panel2.Controls.Add(this.tbCategorie);
             this.panel2.Controls.Add(this.bExportCours);
             this.panel2.Controls.Add(this.lCategorie);
@@ -186,13 +186,14 @@
             this.bExportTousLesCours.Text = "Exporter les cours";
             this.bExportTousLesCours.UseVisualStyleBackColor = true;
             // 
-            // lConfirmation
+            // lInformation
             // 
-            this.lConfirmation.Location = new System.Drawing.Point(258, 280);
-            this.lConfirmation.Name = "lConfirmation";
-            this.lConfirmation.Size = new System.Drawing.Size(318, 31);
-            this.lConfirmation.TabIndex = 15;
-            this.lConfirmation.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lInformation.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.lInformation.Location = new System.Drawing.Point(258, 280);
+            this.lInformation.Name = "lInformation";
+            this.lInformation.Size = new System.Drawing.Size(318, 44);
+            this.lInformation.TabIndex = 15;
+            this.lInformation.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tbCategorie
             // 
@@ -386,6 +387,7 @@
             this.Padding = new System.Windows.Forms.Padding(0, 0, 0, 3);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "fPrincipal";
+            this.Load += new System.EventHandler(this.fPrincipal_Load);
             this.msPrincipal.ResumeLayout(false);
             this.msPrincipal.PerformLayout();
             this.panel1.ResumeLayout(false);
@@ -423,7 +425,7 @@
         private TextBox tbNom;
         private Label lNom;
         private Button bmajCours;
-        private Label lConfirmation;
+        private Label lInformation;
         private TextBox tbCategorie;
         private Label lCategorie;
         private Button bExportTousLesCours;
