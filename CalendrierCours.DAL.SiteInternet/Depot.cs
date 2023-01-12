@@ -235,33 +235,48 @@ namespace CalendrierCours.DAL.SiteInternet
         {
             string gpInfos = "i", gpNumero = "n";
 
-            Regex regexSeance = new Regex($"(?<{gpInfos}>{this.m_proprietes[PROPRIETE_FORMAT_LIGNE_SEANCE]})");
+            Regex regexSeance = new Regex($"\">(?<{gpInfos}>{this.m_proprietes[PROPRIETE_FORMAT_LIGNE_SEANCE]})");
             Regex regexNumeroCours = new Regex($"(?<{gpNumero}>{this.m_proprietes[PROPRIETE_FORMAT_NUMERO_COURS]})");
             int positionIntitule = 0, positionNumero = 1, positionProf = 2, positionSalle = 3;
             int PositionNomProf = 0, positionPrenomProf = 1;
+            
+            ProfesseurInternetDTO nvProf;
+            CoursInternetDTO nvCours;
+            SeanceInternetDTO nvSeance;
 
             string info = regexSeance.Match(p_ligne).Groups[gpInfos].Value;
             string[] infos = info.Split("<br>");
-            infos[positionSalle] = infos[positionSalle].Replace("</td></tr>", String.Empty);
 
             string intituleCours = infos[positionIntitule];
-            string numeroCours = regexNumeroCours.Match(infos[positionNumero]).Groups[gpNumero].Value;
 
-            string[] professeur = infos[positionProf].Split(", ");
-
-            ProfesseurInternetDTO nvProf;
-
-            if (professeur.Length == 2)
+            if (infos.Length == 4)
             {
-                nvProf = new ProfesseurInternetDTO(professeur[PositionNomProf], professeur[positionPrenomProf]);
+                infos[positionSalle] = infos[positionSalle].Replace("</td></tr>", String.Empty);
+
+                string numeroCours = regexNumeroCours.Match(infos[positionNumero]).Groups[gpNumero].Value;
+
+                string[] professeur = infos[positionProf].Split(", ");
+
+
+                if (professeur.Length == 2)
+                {
+                    nvProf = new ProfesseurInternetDTO(professeur[PositionNomProf], professeur[positionPrenomProf]);
+                }
+                else
+                {
+                    nvProf = new ProfesseurInternetDTO("-", "-");
+                }
+
+                nvCours = new CoursInternetDTO(nvProf, numeroCours, intituleCours);
+                nvSeance = new SeanceInternetDTO(p_dateDebut, p_dateFin, infos[positionSalle], Guid.NewGuid());
             }
             else
             {
                 nvProf = new ProfesseurInternetDTO("-", "-");
+                nvCours = new CoursInternetDTO(nvProf, "000-000-SF", intituleCours);
+                nvSeance = new SeanceInternetDTO(p_dateDebut, p_dateFin, "-", Guid.NewGuid());
             }
 
-            CoursInternetDTO nvCours = new CoursInternetDTO(nvProf, numeroCours, intituleCours);
-            SeanceInternetDTO nvSeance = new SeanceInternetDTO(p_dateDebut, p_dateFin, infos[positionSalle], Guid.NewGuid());
             nvCours.Seances.Add(nvSeance);
 
             return nvCours;
