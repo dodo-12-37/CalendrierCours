@@ -37,7 +37,7 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_chemin));
             }
 
-            this.MiseAJourCache(p_cohorte);
+            //this.MiseAJourCache(p_cohorte);
 
             if (p_date is null)
             {
@@ -71,7 +71,7 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_chemin));
             }
 
-            this.MiseAJourCache(p_cohorte);
+            //this.MiseAJourCache(p_cohorte);
 
             if (p_date is null)
             {

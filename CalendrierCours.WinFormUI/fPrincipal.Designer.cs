@@ -28,13 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.lbCohortes = new System.Windows.Forms.ListBox();
             this.msPrincipal = new System.Windows.Forms.MenuStrip();
             this.tsmiFichier = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiExporter = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiPreferences = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiQuitter = new System.Windows.Forms.ToolStripMenuItem();
-            this.lbCohortes = new System.Windows.Forms.ListBox();
             this.lCohortes = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -63,6 +62,21 @@
             this.panel3.SuspendLayout();
             this.SuspendLayout();
             // 
+            // lbCohortes
+            // 
+            this.lbCohortes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.lbCohortes.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.lbCohortes.FormattingEnabled = true;
+            this.lbCohortes.HorizontalScrollbar = true;
+            this.lbCohortes.ItemHeight = 17;
+            this.lbCohortes.Location = new System.Drawing.Point(3, 26);
+            this.lbCohortes.Name = "lbCohortes";
+            this.lbCohortes.ScrollAlwaysVisible = true;
+            this.lbCohortes.Size = new System.Drawing.Size(235, 293);
+            this.lbCohortes.TabIndex = 1;
+            this.lbCohortes.Click += new System.EventHandler(this.lbCohortes_Click);
+            // 
             // msPrincipal
             // 
             this.msPrincipal.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -76,19 +90,12 @@
             // tsmiFichier
             // 
             this.tsmiFichier.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsmiExporter,
             this.tsmiPreferences,
             this.toolStripSeparator1,
             this.tsmiQuitter});
             this.tsmiFichier.Name = "tsmiFichier";
             this.tsmiFichier.Size = new System.Drawing.Size(54, 20);
             this.tsmiFichier.Text = "&Fichier";
-            // 
-            // tsmiExporter
-            // 
-            this.tsmiExporter.Name = "tsmiExporter";
-            this.tsmiExporter.Size = new System.Drawing.Size(153, 22);
-            this.tsmiExporter.Text = "&Exporter";
             // 
             // tsmiPreferences
             // 
@@ -109,24 +116,12 @@
             this.tsmiQuitter.Text = "&Quitter";
             this.tsmiQuitter.Click += new System.EventHandler(this.tsmiQuitter_Click);
             // 
-            // lbCohortes
-            // 
-            this.lbCohortes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.lbCohortes.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.lbCohortes.FormattingEnabled = true;
-            this.lbCohortes.ItemHeight = 21;
-            this.lbCohortes.Location = new System.Drawing.Point(3, 26);
-            this.lbCohortes.Name = "lbCohortes";
-            this.lbCohortes.Size = new System.Drawing.Size(192, 298);
-            this.lbCohortes.TabIndex = 1;
-            // 
             // lCohortes
             // 
             this.lCohortes.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lCohortes.Location = new System.Drawing.Point(0, 0);
             this.lCohortes.Name = "lCohortes";
-            this.lCohortes.Size = new System.Drawing.Size(200, 23);
+            this.lCohortes.Size = new System.Drawing.Size(238, 23);
             this.lCohortes.TabIndex = 2;
             this.lCohortes.Text = "Cohortes";
             this.lCohortes.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -142,7 +137,7 @@
             this.panel1.Location = new System.Drawing.Point(12, 27);
             this.panel1.Name = "panel1";
             this.panel1.Padding = new System.Windows.Forms.Padding(0, 0, 0, 2);
-            this.panel1.Size = new System.Drawing.Size(200, 333);
+            this.panel1.Size = new System.Drawing.Size(241, 333);
             this.panel1.TabIndex = 4;
             // 
             // panel2
@@ -167,7 +162,7 @@
             this.panel2.Controls.Add(this.lNumero);
             this.panel2.Controls.Add(this.lbCours);
             this.panel2.Controls.Add(this.lCours);
-            this.panel2.Location = new System.Drawing.Point(219, 27);
+            this.panel2.Location = new System.Drawing.Point(256, 27);
             this.panel2.Name = "panel2";
             this.panel2.Padding = new System.Windows.Forms.Padding(0, 0, 0, 2);
             this.panel2.Size = new System.Drawing.Size(581, 333);
@@ -197,10 +192,10 @@
             // 
             // tbCategorie
             // 
-            this.tbCategorie.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.tbCategorie.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.tbCategorie.Location = new System.Drawing.Point(343, 170);
             this.tbCategorie.Name = "tbCategorie";
-            this.tbCategorie.Size = new System.Drawing.Size(235, 29);
+            this.tbCategorie.Size = new System.Drawing.Size(235, 25);
             this.tbCategorie.TabIndex = 14;
             // 
             // bExportCours
@@ -228,10 +223,10 @@
             // 
             // tbPrenom
             // 
-            this.tbPrenom.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.tbPrenom.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.tbPrenom.Location = new System.Drawing.Point(343, 135);
             this.tbPrenom.Name = "tbPrenom";
-            this.tbPrenom.Size = new System.Drawing.Size(235, 29);
+            this.tbPrenom.Size = new System.Drawing.Size(235, 25);
             this.tbPrenom.TabIndex = 12;
             // 
             // lPrenom
@@ -246,10 +241,10 @@
             // 
             // tbNom
             // 
-            this.tbNom.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.tbNom.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.tbNom.Location = new System.Drawing.Point(343, 100);
             this.tbNom.Name = "tbNom";
-            this.tbNom.Size = new System.Drawing.Size(235, 29);
+            this.tbNom.Size = new System.Drawing.Size(235, 25);
             this.tbNom.TabIndex = 10;
             // 
             // bmajCours
@@ -278,10 +273,10 @@
             // 
             // tbIntitule
             // 
-            this.tbIntitule.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.tbIntitule.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.tbIntitule.Location = new System.Drawing.Point(343, 65);
             this.tbIntitule.Name = "tbIntitule";
-            this.tbIntitule.Size = new System.Drawing.Size(235, 29);
+            this.tbIntitule.Size = new System.Drawing.Size(235, 25);
             this.tbIntitule.TabIndex = 8;
             // 
             // lIntitule
@@ -296,10 +291,10 @@
             // 
             // tbNumero
             // 
-            this.tbNumero.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.tbNumero.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.tbNumero.Location = new System.Drawing.Point(343, 30);
             this.tbNumero.Name = "tbNumero";
-            this.tbNumero.Size = new System.Drawing.Size(235, 29);
+            this.tbNumero.Size = new System.Drawing.Size(235, 25);
             this.tbNumero.TabIndex = 4;
             // 
             // lNumero
@@ -317,13 +312,15 @@
             // 
             this.lbCours.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.lbCours.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.lbCours.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lbCours.FormattingEnabled = true;
-            this.lbCours.ItemHeight = 21;
+            this.lbCours.HorizontalScrollbar = true;
+            this.lbCours.ItemHeight = 17;
             this.lbCours.Location = new System.Drawing.Point(3, 26);
             this.lbCours.Name = "lbCours";
-            this.lbCours.Size = new System.Drawing.Size(251, 298);
+            this.lbCours.Size = new System.Drawing.Size(251, 293);
             this.lbCours.TabIndex = 1;
+            this.lbCours.Click += new System.EventHandler(this.lbCours_Click);
             // 
             // lCours
             // 
@@ -343,22 +340,22 @@
             this.panel3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.panel3.Controls.Add(this.lbSeances);
             this.panel3.Controls.Add(this.lSeances);
-            this.panel3.Location = new System.Drawing.Point(806, 27);
+            this.panel3.Location = new System.Drawing.Point(843, 27);
             this.panel3.Name = "panel3";
             this.panel3.Padding = new System.Windows.Forms.Padding(0, 0, 0, 2);
-            this.panel3.Size = new System.Drawing.Size(266, 333);
+            this.panel3.Size = new System.Drawing.Size(229, 333);
             this.panel3.TabIndex = 6;
             // 
             // lbSeances
             // 
             this.lbSeances.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.lbSeances.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.lbSeances.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lbSeances.FormattingEnabled = true;
-            this.lbSeances.ItemHeight = 21;
+            this.lbSeances.ItemHeight = 17;
             this.lbSeances.Location = new System.Drawing.Point(3, 30);
             this.lbSeances.Name = "lbSeances";
-            this.lbSeances.Size = new System.Drawing.Size(260, 298);
+            this.lbSeances.Size = new System.Drawing.Size(223, 293);
             this.lbSeances.TabIndex = 1;
             // 
             // lSeances
@@ -366,7 +363,7 @@
             this.lSeances.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lSeances.Location = new System.Drawing.Point(0, 0);
             this.lSeances.Name = "lSeances";
-            this.lSeances.Size = new System.Drawing.Size(266, 23);
+            this.lSeances.Size = new System.Drawing.Size(226, 23);
             this.lSeances.TabIndex = 2;
             this.lSeances.Text = "Séances";
             this.lSeances.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -403,7 +400,6 @@
 
         private MenuStrip msPrincipal;
         private ToolStripMenuItem tsmiFichier;
-        private ToolStripMenuItem tsmiExporter;
         private ToolStripMenuItem tsmiPreferences;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem tsmiQuitter;

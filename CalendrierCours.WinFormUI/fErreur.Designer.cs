@@ -1,6 +1,6 @@
 ﻿namespace CalendrierCours.WinFormUI
 {
-    partial class fChargement
+    partial class fErreur
     {
         /// <summary>
         ///  Required designer variable.
@@ -28,38 +28,37 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.lChargement = new System.Windows.Forms.Label();
+            this.lMessage = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // lChargement
+            // lMessage
             // 
-            this.lChargement.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.lMessage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lChargement.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point);
-            this.lChargement.Location = new System.Drawing.Point(12, 22);
-            this.lChargement.Name = "lChargement";
-            this.lChargement.Size = new System.Drawing.Size(388, 22);
-            this.lChargement.TabIndex = 0;
-            this.lChargement.Text = "Chargement des propriétés...";
-            this.lChargement.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.lMessage.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point);
+            this.lMessage.Location = new System.Drawing.Point(12, 22);
+            this.lMessage.Name = "lMessage";
+            this.lMessage.Size = new System.Drawing.Size(388, 22);
+            this.lMessage.TabIndex = 0;
+            this.lMessage.Text = "Chargement des propriétés...";
+            this.lMessage.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // fChargement
+            // fErreur
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(412, 62);
-            this.Controls.Add(this.lChargement);
+            this.Controls.Add(this.lMessage);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Name = "fChargement";
+            this.Name = "fErreur";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "CalendrierCours";
-            this.Load += new System.EventHandler(this.fChargement_Load);
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private Label lChargement;
+        private Label lMessage;
     }
 }

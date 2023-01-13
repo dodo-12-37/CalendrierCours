@@ -14,41 +14,65 @@ namespace CalendrierCours.WinFormUI
         {
             ApplicationConfiguration.Initialize();
 
-            IProprietes? proprietes = null;
+            IProprietes? proprietes;
             IDepotCours? depotCours = null;
             Traitement? traitement = null;
             List<Cohorte>? cohortes = null;
+            string message = "";
 
             bool estCharge;
-            bool chargerSuivant;
-
-            //fChargement chargement = new fChargement();
-
-            //System.Windows.Forms.Application.OpenForms.AsParallel();
-            //System.Windows.Forms.Application.Run(chargement);
 
             proprietes = ChargerProprietes();
             estCharge = proprietes is not null;
+
+            if (!estCharge)
+            {
+                message = "Erreur dans le chargement des propriétés !";
+            }
+
 
             if (estCharge)
             {
                 depotCours = ChargerDepotCours(proprietes);
                 estCharge = depotCours is not null;
+
+                if (!estCharge)
+                {
+                    message = "Erreur dans le chargement du dépôt des cours !";
+                }
             }
 
             if (estCharge)
             {
                 traitement = ChargerTraitement(depotCours);
                 estCharge = traitement is not null;
+
+                if (!estCharge)
+                {
+                    message = "Erreur dans le chargement du traitement !";
+                }
             }
 
             if (estCharge)
             {
                 cohortes = ChargerCohortes(depotCours, proprietes);
+
+                if (cohortes is null || cohortes.Count == 0)
+                {
+                    message = "Erreur dans le chargement des cours !";
+                }
             }
 
-            Application application = new Application(proprietes, depotCours, traitement, cohortes);
-            application.Run();
+            if (estCharge)
+            {
+                message = "Bienvenue !";
+                Application application = new Application(proprietes, traitement, cohortes);
+                application.Run(message);
+            }
+            else
+            {
+                System.Windows.Forms.Application.Run(new fErreur(message));
+            }
         }
 
         private static IProprietes RetournerProprietes()
@@ -136,9 +160,5 @@ namespace CalendrierCours.WinFormUI
             }
             return retour;
         }
-
-
-
-
     }
 }

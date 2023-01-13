@@ -6,15 +6,15 @@ using System.Text.RegularExpressions;
 
 namespace CalendrierCours.WinFormUI
 {
-    public class CohorteViewModelConsole
+    public class CohorteViewModelWinForm
     {
         #region Membres
-        private List<CoursViewModelConsole> m_listeCours;
+        private List<CoursViewModelWinForm> m_listeCours;
         private string m_numero;
         #endregion
 
         #region Ctor
-        public CohorteViewModelConsole(string p_numero)
+        public CohorteViewModelWinForm(string p_numero)
         {
             if (String.IsNullOrWhiteSpace(p_numero))
             {
@@ -22,9 +22,9 @@ namespace CalendrierCours.WinFormUI
             }
 
             this.Numero = p_numero;
-            this.m_listeCours = new List<CoursViewModelConsole>();
+            this.m_listeCours = new List<CoursViewModelWinForm>();
         }
-        public CohorteViewModelConsole(List<CoursViewModelConsole> p_listeCours, string p_numero)
+        public CohorteViewModelWinForm(List<CoursViewModelWinForm> p_listeCours, string p_numero)
         {
             if (p_listeCours is null)
             {
@@ -38,13 +38,13 @@ namespace CalendrierCours.WinFormUI
             this.m_listeCours = p_listeCours;
             this.m_numero = p_numero;
         }
-        public CohorteViewModelConsole(Cohorte p_cohorte)
-            : this(p_cohorte.Cours.Select(c => new CoursViewModelConsole(c)).ToList(), p_cohorte.Numero)
+        public CohorteViewModelWinForm(Cohorte p_cohorte)
+            : this(p_cohorte.Cours.Select(c => new CoursViewModelWinForm(c)).ToList(), p_cohorte.Numero)
         { }
         #endregion
 
         #region Proprietes
-        public List<CoursViewModelConsole> ListeCours
+        public List<CoursViewModelWinForm> ListeCours
         {
             get
             {
@@ -89,26 +89,27 @@ namespace CalendrierCours.WinFormUI
         }
         public override bool Equals(object? obj)
         {
-            return obj is CohorteViewModelConsole cohorte
+            return obj is CohorteViewModelWinForm cohorte
                 && cohorte.Numero == this.m_numero;
         }
         #endregion
     }
-    public class CoursViewModelConsole
+    public class CoursViewModelWinForm
     {
         #region Membres
-        private ProfesseurViewModelConsole m_enseignant;
-        private List<SeanceViewModelConsole> m_seances;
+        private ProfesseurViewModelWinForm m_enseignant;
+        private List<SeanceViewModelWinForm> m_seances;
         private string m_intitule;
         private string m_numero;
+        private string m_categorie;
         #endregion
 
         #region Ctor
-        public CoursViewModelConsole(ProfesseurViewModelConsole p_enseignant, string p_numero, string p_intitule)
-            : this(p_enseignant, p_numero, p_intitule, new List<SeanceViewModelConsole>())
+        public CoursViewModelWinForm(ProfesseurViewModelWinForm p_enseignant, string p_numero, string p_intitule)
+            : this(p_enseignant, p_numero, p_intitule, new List<SeanceViewModelWinForm>())
         { }
-        public CoursViewModelConsole(ProfesseurViewModelConsole p_enseignant, string p_numero, string p_intitule
-            , List<SeanceViewModelConsole> p_seances)
+        public CoursViewModelWinForm(ProfesseurViewModelWinForm p_enseignant, string p_numero, string p_intitule
+            , List<SeanceViewModelWinForm> p_seances)
         {
             if (p_enseignant is null)
             {
@@ -133,15 +134,16 @@ namespace CalendrierCours.WinFormUI
             this.m_intitule = p_intitule;
             this.m_seances = p_seances;
             this.m_numero = p_numero;
+            this.m_categorie = "";
         }
-        public CoursViewModelConsole(Cours p_cours)
-            : this(new ProfesseurViewModelConsole(p_cours.Enseignant), p_cours.Numero, p_cours.Intitule
-                  , p_cours.Seances.Select(s => new SeanceViewModelConsole(s)).ToList())
+        public CoursViewModelWinForm(Cours p_cours)
+            : this(new ProfesseurViewModelWinForm(p_cours.Enseignant), p_cours.Numero, p_cours.Intitule
+                  , p_cours.Seances.Select(s => new SeanceViewModelWinForm(s)).ToList())
         { }
         #endregion
 
         #region Proprietes
-        public ProfesseurViewModelConsole Enseignant
+        public ProfesseurViewModelWinForm Enseignant
         {
             get { return this.m_enseignant; }
             set
@@ -167,6 +169,19 @@ namespace CalendrierCours.WinFormUI
                 this.m_intitule = value;
             }
         }
+        public string Categorie
+        {
+            get { return this.m_categorie; }
+            set
+            {
+                if (String.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                }
+
+                this.m_categorie = value;
+            }
+        }
         public string Numero
         {
             get { return this.m_numero; }
@@ -186,7 +201,7 @@ namespace CalendrierCours.WinFormUI
                 this.m_numero = value;
             }
         }
-        public List<SeanceViewModelConsole> Seances
+        public List<SeanceViewModelWinForm> Seances
         {
             get
             {
@@ -209,22 +224,22 @@ namespace CalendrierCours.WinFormUI
         {
             List<Seance> Seances = this.m_seances.Select(s => s.VersEntite()).ToList();
 
-            return new Cours(this.m_enseignant.VersEntite(), this.m_numero, this.m_intitule, Seances);
+            Cours cours = new Cours(this.m_enseignant.VersEntite(), this.m_numero, this.m_intitule, Seances);
+            cours.Categorie = this.m_categorie;
+
+            return cours;
         }
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
 
             sb.Append($"Cours n° {this.Numero} - {this.Intitule} ");
-            sb.Append($"donné par {this.Enseignant.ToString()} ");
-            sb.AppendLine($"- Nombre de séances : {this.Seances.Count}");
-            this.m_seances.ForEach(s => sb.AppendLine($"\t{s.ToString()}"));
 
             return sb.ToString();
         }
         public override bool Equals(object? obj)
         {
-            return obj is CoursViewModelConsole cours
+            return obj is CoursViewModelWinForm cours
                 && this.Enseignant.Equals(cours.Enseignant)
                 && Numero == cours.Numero
                 && Intitule == cours.Intitule;
@@ -274,7 +289,7 @@ namespace CalendrierCours.WinFormUI
         }
         #endregion
     }
-    public class SeanceViewModelConsole
+    public class SeanceViewModelWinForm
     {
         #region Membres
         private DateTime m_dateDebut;
@@ -284,7 +299,7 @@ namespace CalendrierCours.WinFormUI
         #endregion
 
         #region Ctor
-        public SeanceViewModelConsole(DateTime p_dateDebut, DateTime p_dateFin, string p_salle, Guid p_uid)
+        public SeanceViewModelWinForm(DateTime p_dateDebut, DateTime p_dateFin, string p_salle, Guid p_uid)
         {
             if (p_dateDebut >= p_dateFin)
             {
@@ -308,7 +323,7 @@ namespace CalendrierCours.WinFormUI
             this.m_dateFin = p_dateFin;
             this.m_salle = p_salle;
         }
-        public SeanceViewModelConsole(Seance p_seance) :
+        public SeanceViewModelWinForm(Seance p_seance) :
             this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle, p_seance.UID)
         { }
         #endregion
@@ -366,7 +381,7 @@ namespace CalendrierCours.WinFormUI
             CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture("fr-CA");
             StringBuilder sb = new StringBuilder();
 
-            sb.Append($"Le {this.m_dateDebut.ToString("dddd dd MMMM yyyy", cultureInfo)} ");
+            sb.Append($"Le {this.m_dateDebut.ToString("dd-MM-yyyy", cultureInfo)} ");
             sb.Append($"de {this.m_dateDebut.ToString("HH:mm", cultureInfo)}");
             sb.Append($" à {this.m_dateFin.ToString("HH:mm", cultureInfo)}");
 
@@ -374,7 +389,7 @@ namespace CalendrierCours.WinFormUI
         }
         public override bool Equals(object? obj)
         {
-            return obj is SeanceViewModelConsole seance
+            return obj is SeanceViewModelWinForm seance
                 && seance.UID == this.UID
                 && seance.DateDebut == this.DateDebut
                 && seance.DateFin == this.DateFin
@@ -386,7 +401,7 @@ namespace CalendrierCours.WinFormUI
         }
         #endregion
     }
-    public class ProfesseurViewModelConsole
+    public class ProfesseurViewModelWinForm
     {
         #region Membres
         private string m_nom;
@@ -394,7 +409,7 @@ namespace CalendrierCours.WinFormUI
         #endregion
 
         #region Ctor
-        public ProfesseurViewModelConsole(string p_nom, string p_prenom)
+        public ProfesseurViewModelWinForm(string p_nom, string p_prenom)
         {
             if (String.IsNullOrWhiteSpace(p_nom))
             {
@@ -408,7 +423,7 @@ namespace CalendrierCours.WinFormUI
             this.m_nom = p_nom;
             this.m_prenom = p_prenom;
         }
-        public ProfesseurViewModelConsole(Professeur p_enseignant) : this(p_enseignant.Nom, p_enseignant.Prenom) { }
+        public ProfesseurViewModelWinForm(Professeur p_enseignant) : this(p_enseignant.Nom, p_enseignant.Prenom) { }
         #endregion
 
         #region Proprietes
@@ -451,7 +466,7 @@ namespace CalendrierCours.WinFormUI
         }
         public override bool Equals(object? obj)
         {
-            return obj is ProfesseurViewModelConsole professeur &&
+            return obj is ProfesseurViewModelWinForm professeur &&
                    Nom == professeur.Nom &&
                    Prenom == professeur.Prenom;
         }
