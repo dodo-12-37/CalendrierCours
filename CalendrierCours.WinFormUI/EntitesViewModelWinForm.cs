@@ -1,8 +1,6 @@
 ﻿using CalendrierCours.Entites;
-using Microsoft.Extensions.Configuration;
 using System.Globalization;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace CalendrierCours.WinFormUI
 {
@@ -21,8 +19,8 @@ namespace CalendrierCours.WinFormUI
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
             }
 
-            this.Numero = p_numero;
-            this.m_listeCours = new List<CoursViewModelWinForm>();
+            Numero = p_numero;
+            m_listeCours = new List<CoursViewModelWinForm>();
         }
         public CohorteViewModelWinForm(List<CoursViewModelWinForm> p_listeCours, string p_numero)
         {
@@ -35,8 +33,8 @@ namespace CalendrierCours.WinFormUI
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
             }
 
-            this.m_listeCours = p_listeCours;
-            this.m_numero = p_numero;
+            m_listeCours = p_listeCours;
+            m_numero = p_numero;
         }
         public CohorteViewModelWinForm(Cohorte p_cohorte)
             : this(p_cohorte.Cours.Select(c => new CoursViewModelWinForm(c)).ToList(), p_cohorte.Numero)
@@ -48,7 +46,7 @@ namespace CalendrierCours.WinFormUI
         {
             get
             {
-                return this.m_listeCours;
+                return m_listeCours;
             }
             set
             {
@@ -56,19 +54,19 @@ namespace CalendrierCours.WinFormUI
                 {
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
-                this.m_listeCours = value;
+                m_listeCours = value;
             }
         }
         public string Numero
         {
-            get { return this.m_numero; }
+            get { return m_numero; }
             set
             {
                 if (String.IsNullOrWhiteSpace(value))
                 {
                     throw new ArgumentNullException("Ne doit pas etre null ou vide");
                 }
-                this.m_numero = value;
+                m_numero = value;
             }
         }
         #endregion
@@ -76,21 +74,21 @@ namespace CalendrierCours.WinFormUI
         #region Methodes
         public Cohorte VersEntite()
         {
-            List<Cours> listeCours = this.m_listeCours.Select(cDTo => cDTo.VersEntites()).ToList();
+            List<Cours> listeCours = m_listeCours.Select(cDTo => cDTo.VersEntites()).ToList();
 
-            return new Cohorte(listeCours, this.Numero);
+            return new Cohorte(listeCours, Numero);
         }
         public override string ToString()
         {
             int positionPeriode = 1, positionNumero = 2;
-            string[] elementsCohorte = this.m_numero.Split('_');
+            string[] elementsCohorte = m_numero.Split('_');
 
             return $"Cohorte n° {elementsCohorte[positionNumero]} - période : {elementsCohorte[positionPeriode]}";
         }
         public override bool Equals(object? obj)
         {
             return obj is CohorteViewModelWinForm cohorte
-                && cohorte.Numero == this.m_numero;
+                && cohorte.Numero == m_numero;
         }
         #endregion
     }
@@ -115,26 +113,20 @@ namespace CalendrierCours.WinFormUI
             {
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_enseignant));
             }
-            if (String.IsNullOrWhiteSpace(p_intitule))
+            if (p_intitule is null)
             {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_intitule));
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_intitule));
             }
             if (p_seances is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_seances));
             }
 
-            Regex formatNumero = new Regex(this.RecupereFormatNumero());
-            if (!formatNumero.IsMatch(p_numero))
-            {
-                throw new FormatException("Le numero n'est pas au bon format");
-            }
-
-            this.m_enseignant = p_enseignant;
-            this.m_intitule = p_intitule;
-            this.m_seances = p_seances;
-            this.m_numero = p_numero;
-            this.m_categorie = "";
+            m_enseignant = p_enseignant;
+            m_intitule = p_intitule;
+            m_seances = p_seances;
+            m_numero = p_numero;
+            m_categorie = "";
         }
         public CoursViewModelWinForm(Cours p_cours)
             : this(new ProfesseurViewModelWinForm(p_cours.Enseignant), p_cours.Numero, p_cours.Intitule
@@ -145,7 +137,7 @@ namespace CalendrierCours.WinFormUI
         #region Proprietes
         public ProfesseurViewModelWinForm Enseignant
         {
-            get { return this.m_enseignant; }
+            get { return m_enseignant; }
             set
             {
                 if (value is null)
@@ -153,59 +145,53 @@ namespace CalendrierCours.WinFormUI
                     throw new ArgumentNullException("Ne doit pas etre null");
                 }
 
-                this.m_enseignant = value;
+                m_enseignant = value;
             }
         }
         public string Intitule
         {
-            get { return this.m_intitule; }
+            get { return m_intitule; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
-                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                    throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_intitule = value;
+                m_intitule = value;
             }
         }
         public string Categorie
         {
-            get { return this.m_categorie; }
+            get { return m_categorie; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
-                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                    throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_categorie = value;
+                m_categorie = value;
             }
         }
         public string Numero
         {
-            get { return this.m_numero; }
+            get { return m_numero; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
-                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                    throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                Regex formatNumero = new Regex(this.RecupereFormatNumero());
-                if (!formatNumero.IsMatch(value))
-                {
-                    throw new FormatException("Le numero n'est pas au bon format");
-                }
-
-                this.m_numero = value;
+                m_numero = value;
             }
         }
         public List<SeanceViewModelWinForm> Seances
         {
             get
             {
-                return this.m_seances;
+                return m_seances;
             }
             set
             {
@@ -214,7 +200,7 @@ namespace CalendrierCours.WinFormUI
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_seances = value;
+                m_seances = value;
             }
         }
         #endregion
@@ -222,10 +208,10 @@ namespace CalendrierCours.WinFormUI
         #region Methodes
         public Cours VersEntites()
         {
-            List<Seance> Seances = this.m_seances.Select(s => s.VersEntite()).ToList();
+            List<Seance> Seances = m_seances.Select(s => s.VersEntite()).ToList();
 
-            Cours cours = new Cours(this.m_enseignant.VersEntite(), this.m_numero, this.m_intitule, Seances);
-            cours.Categorie = this.m_categorie;
+            Cours cours = new Cours(m_enseignant.VersEntite(), m_numero, m_intitule, Seances);
+            cours.Categorie = m_categorie;
 
             return cours;
         }
@@ -233,59 +219,27 @@ namespace CalendrierCours.WinFormUI
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.Append($"Cours n° {this.Numero} - {this.Intitule} ");
+            if (m_numero == String.Empty)
+            {
+                sb.Append($"Cours {m_intitule}");
+            }
+            else
+            {
+                sb.Append($"Cours n° {m_numero} - {m_intitule}");
+            }
 
             return sb.ToString();
         }
         public override bool Equals(object? obj)
         {
             return obj is CoursViewModelWinForm cours
-                && this.Enseignant.Equals(cours.Enseignant)
+                && Enseignant.Equals(cours.Enseignant)
                 && Numero == cours.Numero
                 && Intitule == cours.Intitule;
         }
         public override int GetHashCode()
         {
             return HashCode.Combine(Enseignant, Intitule, Numero);
-        }
-
-        private IConfigurationRoot LireFichierConfig()
-        {
-            IConfigurationRoot? configuration;
-
-            try
-            {
-                configuration =
-                    new ConfigurationBuilder()
-                      .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
-                      .AddJsonFile("appsettings.json", false)
-                      .Build();
-            }
-            catch (Exception e)
-            {
-                throw new InvalidDepotException("Le fichier de configuration est corrompu", e);
-            }
-
-            return configuration;
-        }
-        private string RecupereFormatNumero()
-        {
-            string? retour;
-            IConfigurationRoot configuration = this.LireFichierConfig();
-
-            if (configuration is null)
-            {
-                throw new Exception("Erreur dans la lecture du fichier de configuration");
-            }
-
-            retour = configuration["formatNumeroCours"];
-
-            if (retour is null)
-            {
-                throw new Exception("Erreur dans la lecture du fichier de configuration");
-            }
-
-            return retour;
         }
         #endregion
     }
@@ -305,23 +259,23 @@ namespace CalendrierCours.WinFormUI
             {
                 throw new ArgumentException("La date de debut doit etre inferieur a la date de fin");
             }
-            if (String.IsNullOrWhiteSpace(p_salle))
+            if (p_salle is null)
             {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide");
+                throw new ArgumentNullException("Ne doit pas etre null");
             }
 
             if (p_uid == Guid.Empty)
             {
-                this.m_uid = Guid.NewGuid();
+                m_uid = Guid.NewGuid();
             }
             else
             {
-                this.m_uid = p_uid;
+                m_uid = p_uid;
             }
 
-            this.m_dateDebut = p_dateDebut;
-            this.m_dateFin = p_dateFin;
-            this.m_salle = p_salle;
+            m_dateDebut = p_dateDebut;
+            m_dateFin = p_dateFin;
+            m_salle = p_salle;
         }
         public SeanceViewModelWinForm(Seance p_seance) :
             this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle, p_seance.UID)
@@ -331,73 +285,73 @@ namespace CalendrierCours.WinFormUI
         #region Proprietes
         public DateTime DateDebut
         {
-            get { return this.m_dateDebut; }
+            get { return m_dateDebut; }
             set
             {
-                if (value >= this.m_dateFin)
+                if (value >= m_dateFin)
                 {
                     throw new ArgumentException("La date de debut doit etre inferieur a la date de fin");
                 }
 
-                this.m_dateDebut = value;
+                m_dateDebut = value;
             }
         }
         public DateTime DateFin
         {
-            get { return this.m_dateFin; }
+            get { return m_dateFin; }
             set
             {
-                if (value <= this.m_dateDebut)
+                if (value <= m_dateDebut)
                 {
                     throw new ArgumentException("La date de debut doit etre inferieur a la date de fin");
                 }
 
-                this.m_dateFin = value;
+                m_dateFin = value;
             }
         }
         public string Salle
         {
-            get { return this.m_salle; }
+            get { return m_salle; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
-                    throw new ArgumentException("Ne doit pas etre null ou vide");
+                    throw new ArgumentException("Ne doit pas etre null");
                 }
 
-                this.m_salle = value;
+                m_salle = value;
             }
         }
-        public Guid UID { get { return this.m_uid; } }
+        public Guid UID { get { return m_uid; } }
         #endregion
 
         #region Methodes
         public Seance VersEntite()
         {
-            return new Seance(this.m_dateDebut, this.m_dateFin, this.m_salle, this.m_uid);
+            return new Seance(m_dateDebut, m_dateFin, m_salle, m_uid);
         }
         public override string ToString()
         {
             CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture("fr-CA");
             StringBuilder sb = new StringBuilder();
 
-            sb.Append($"Le {this.m_dateDebut.ToString("dd-MM-yyyy", cultureInfo)} ");
-            sb.Append($"de {this.m_dateDebut.ToString("HH:mm", cultureInfo)}");
-            sb.Append($" à {this.m_dateFin.ToString("HH:mm", cultureInfo)}");
+            sb.Append($"Le {m_dateDebut.ToString("dd-MM-yyyy", cultureInfo)} ");
+            sb.Append($"de {m_dateDebut.ToString("HH:mm", cultureInfo)}");
+            sb.Append($" à {m_dateFin.ToString("HH:mm", cultureInfo)}");
 
             return sb.ToString();
         }
         public override bool Equals(object? obj)
         {
             return obj is SeanceViewModelWinForm seance
-                && seance.UID == this.UID
-                && seance.DateDebut == this.DateDebut
-                && seance.DateFin == this.DateFin
-                && seance.Salle == this.Salle;
+                && seance.UID == UID
+                && seance.DateDebut == DateDebut
+                && seance.DateFin == DateFin
+                && seance.Salle == Salle;
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.m_uid, this.m_dateDebut, this.m_dateFin, this.m_salle);
+            return HashCode.Combine(m_uid, m_dateDebut, m_dateFin, m_salle);
         }
         #endregion
     }
@@ -411,17 +365,17 @@ namespace CalendrierCours.WinFormUI
         #region Ctor
         public ProfesseurViewModelWinForm(string p_nom, string p_prenom)
         {
-            if (String.IsNullOrWhiteSpace(p_nom))
+            if (p_nom is null)
             {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_nom));
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_nom));
             }
-            if (String.IsNullOrWhiteSpace(p_prenom))
+            if (p_prenom is null)
             {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide");
+                throw new ArgumentNullException("Ne doit pas etre null");
             }
 
-            this.m_nom = p_nom;
-            this.m_prenom = p_prenom;
+            m_nom = p_nom;
+            m_prenom = p_prenom;
         }
         public ProfesseurViewModelWinForm(Professeur p_enseignant) : this(p_enseignant.Nom, p_enseignant.Prenom) { }
         #endregion
@@ -429,28 +383,28 @@ namespace CalendrierCours.WinFormUI
         #region Proprietes
         public string Nom
         {
-            get { return this.m_nom; }
+            get { return m_nom; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
-                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                    throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_nom = value;
+                m_nom = value;
             }
         }
         public string Prenom
         {
-            get { return this.m_prenom; }
+            get { return m_prenom; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
-                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                    throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_prenom = value;
+                m_prenom = value;
             }
         }
         #endregion
@@ -458,11 +412,11 @@ namespace CalendrierCours.WinFormUI
         #region Methodes
         public Professeur VersEntite()
         {
-            return new Professeur(this.m_nom, this.m_prenom);
+            return new Professeur(m_nom, m_prenom);
         }
         public override string ToString()
         {
-            return $"{this.m_prenom} {this.m_nom}";
+            return $"{m_prenom} {m_nom}";
         }
         public override bool Equals(object? obj)
         {

@@ -26,24 +26,17 @@ namespace CalendrierCours.DAL.ExportCoursICS
             {
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_enseignant));
             }
-            if (String.IsNullOrWhiteSpace(p_intitule))
+            if (p_intitule is null)
             {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_intitule));
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_intitule));
             }
-            if (String.IsNullOrWhiteSpace(p_numero))
+            if (p_numero is null)
             {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_numero));
             }
             if (p_seances is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_seances));
-            }
-
-            Regex regexNumeroCours = new Regex(this.RecupereFormatNumero());
-
-            if (!regexNumeroCours.IsMatch(p_numero))
-            {
-                throw new FormatException("Le format du numero ne correspond pas");
             }
 
             this.m_intitule = p_intitule;
@@ -98,7 +91,7 @@ namespace CalendrierCours.DAL.ExportCoursICS
             get { return this.m_intitule; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
                     throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
                 }
@@ -111,15 +104,9 @@ namespace CalendrierCours.DAL.ExportCoursICS
             get { return this.m_numero; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
                     throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
-                }
-
-                Regex format = new Regex(this.RecupereFormatNumero());
-                if (!format.IsMatch(value))
-                {
-                    throw new FormatException("Le numero n'est pas au bon format");
                 }
 
                 this.m_intitule = value;
@@ -147,45 +134,6 @@ namespace CalendrierCours.DAL.ExportCoursICS
         {
             return HashCode.Combine(Enseignant, Intitule, Numero);
         }
-
-        private IConfigurationRoot LireFichierConfig()
-        {
-            IConfigurationRoot? configuration;
-
-            try
-            {
-                configuration =
-                    new ConfigurationBuilder()
-                      .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
-                      .AddJsonFile("appsettings.json", false)
-                      .Build();
-            }
-            catch (Exception e)
-            {
-                throw new InvalidDepotException("Le fichier de configuration est corrompu", e);
-            }
-
-            return configuration;
-        }
-        private string RecupereFormatNumero()
-        {
-            string? retour;
-            IConfigurationRoot configuration = this.LireFichierConfig();
-
-            if (configuration is null)
-            {
-                throw new Exception("Erreur dans la lecture du fichier de configuration");
-            }
-
-            retour = configuration["formatNumeroCours"];
-
-            if (retour is null)
-            {
-                throw new Exception("Erreur dans la lecture du fichier de configuration");
-            }
-
-            return retour;
-        }
         #endregion
     }
     public class SeanceICSDTO
@@ -204,9 +152,9 @@ namespace CalendrierCours.DAL.ExportCoursICS
             {
                 throw new ArgumentException("La date de debut doit etre inferieur a la date de fin");
             }
-            if (String.IsNullOrWhiteSpace(p_salle))
+            if (p_salle is null)
             {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide");
+                throw new ArgumentNullException("Ne doit pas etre null");
             }
 
             if (p_uid == Guid.Empty)
@@ -258,9 +206,9 @@ namespace CalendrierCours.DAL.ExportCoursICS
             get { return this.m_salle; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
-                    throw new ArgumentException("Ne doit pas etre null ou vide");
+                    throw new ArgumentException("Ne doit pas etre null");
                 }
 
                 this.m_salle = value;
@@ -298,13 +246,13 @@ namespace CalendrierCours.DAL.ExportCoursICS
         #region Ctor
         public ProfesseurICSDTO(string p_nom, string p_prenom)
         {
-            if (String.IsNullOrWhiteSpace(p_nom))
+            if (p_nom is null)
             {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_nom));
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_nom));
             }
-            if (String.IsNullOrWhiteSpace(p_prenom))
+            if (p_prenom is null)
             {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide");
+                throw new ArgumentNullException("Ne doit pas etre null");
             }
 
             this.m_nom = p_nom;

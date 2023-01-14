@@ -114,19 +114,13 @@ namespace CalendrierCours.ConsoleUI
             {
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_enseignant));
             }
-            if (String.IsNullOrWhiteSpace(p_intitule))
+            if (p_intitule is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_intitule));
             }
             if (p_seances is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_seances));
-            }
-
-            Regex formatNumero = new Regex(this.RecupereFormatNumero());
-            if (!formatNumero.IsMatch(p_numero))
-            {
-                throw new FormatException("Le numero n'est pas au bon format");
             }
 
             this.m_enseignant = p_enseignant;
@@ -159,7 +153,7 @@ namespace CalendrierCours.ConsoleUI
             get { return this.m_intitule; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
                     throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
                 }
@@ -172,15 +166,9 @@ namespace CalendrierCours.ConsoleUI
             get { return this.m_numero; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
                     throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
-                }
-
-                Regex formatNumero = new Regex(this.RecupereFormatNumero());
-                if (!formatNumero.IsMatch(value))
-                {
-                    throw new FormatException("Le numero n'est pas au bon format");
                 }
 
                 this.m_numero = value;
@@ -233,45 +221,6 @@ namespace CalendrierCours.ConsoleUI
         {
             return HashCode.Combine(Enseignant, Intitule, Numero);
         }
-
-        private IConfigurationRoot LireFichierConfig()
-        {
-            IConfigurationRoot? configuration;
-
-            try
-            {
-                configuration =
-                    new ConfigurationBuilder()
-                      .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
-                      .AddJsonFile("appsettings.json", false)
-                      .Build();
-            }
-            catch (Exception e)
-            {
-                throw new InvalidDepotException("Le fichier de configuration est corrompu", e);
-            }
-
-            return configuration;
-        }
-        private string RecupereFormatNumero()
-        {
-            string? retour;
-            IConfigurationRoot configuration = this.LireFichierConfig();
-
-            if (configuration is null)
-            {
-                throw new Exception("Erreur dans la lecture du fichier de configuration");
-            }
-
-            retour = configuration["formatNumeroCours"];
-
-            if (retour is null)
-            {
-                throw new Exception("Erreur dans la lecture du fichier de configuration");
-            }
-
-            return retour;
-        }
         #endregion
     }
     public class SeanceViewModelConsole
@@ -290,7 +239,7 @@ namespace CalendrierCours.ConsoleUI
             {
                 throw new ArgumentException("La date de debut doit etre inferieur a la date de fin");
             }
-            if (String.IsNullOrWhiteSpace(p_salle))
+            if (p_salle is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null ou vide");
             }
@@ -344,7 +293,7 @@ namespace CalendrierCours.ConsoleUI
             get { return this.m_salle; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
                     throw new ArgumentException("Ne doit pas etre null ou vide");
                 }
@@ -395,11 +344,11 @@ namespace CalendrierCours.ConsoleUI
         #region Ctor
         public ProfesseurViewModelConsole(string p_nom, string p_prenom)
         {
-            if (String.IsNullOrWhiteSpace(p_nom))
+            if (p_nom is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_nom));
             }
-            if (String.IsNullOrWhiteSpace(p_prenom))
+            if (p_prenom is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null ou vide");
             }
@@ -416,7 +365,7 @@ namespace CalendrierCours.ConsoleUI
             get { return this.m_nom; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
                     throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
                 }
@@ -429,7 +378,7 @@ namespace CalendrierCours.ConsoleUI
             get { return this.m_prenom; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
                     throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
                 }

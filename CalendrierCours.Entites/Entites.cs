@@ -90,7 +90,6 @@ namespace CalendrierCours.Entites
         private string m_numero;
         private string? m_description;
         private string? m_categorie;
-        private Regex m_formatNumero;
         #endregion
 
         #region Ctor
@@ -102,24 +101,17 @@ namespace CalendrierCours.Entites
             {
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_enseignant));
             }
-            if (String.IsNullOrWhiteSpace(p_intitule))
+            if (p_intitule is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_intitule));
             }
-            if (String.IsNullOrWhiteSpace(p_numero))
+            if (p_numero is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
             }
             if (p_seances is null)
             {
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_seances));
-            }
-
-            m_formatNumero = new Regex(this.LireFichierConfig());
-
-            if (!this.m_formatNumero.IsMatch(p_numero))
-            {
-                throw new FormatException("Le numero ne correspond pas au format");
             }
 
             this.m_enseignant = p_enseignant;
@@ -168,9 +160,9 @@ namespace CalendrierCours.Entites
             get { return this.m_intitule; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
-                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                    throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
                 this.m_intitule = value;
@@ -181,13 +173,9 @@ namespace CalendrierCours.Entites
             get { return this.m_numero; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
-                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
-                }
-                if (!this.m_formatNumero.IsMatch(value))
-                {
-                    throw new FormatException("Le numero ne correspond pas au format");
+                    throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
                 this.m_intitule = value;
@@ -198,32 +186,6 @@ namespace CalendrierCours.Entites
         #endregion
 
         #region Methodes
-        private string LireFichierConfig()
-        {
-            string? config;
-
-            try
-            {
-                IConfigurationRoot configuration =
-                    new ConfigurationBuilder()
-                      .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
-                      .AddJsonFile("appsettings.json", false)
-                      .Build();
-
-                config = configuration["formatNumeroCours"];
-            }
-            catch (Exception)
-            {
-                config = null;
-            }
-
-            if (config is null)
-            {
-                config = "[0-9]{3}-[A-Z0-9]{3}-SF";
-            }
-
-            return config;
-        }
         public override bool Equals(object? obj)
         {
             return obj is Cours cours
@@ -253,9 +215,9 @@ namespace CalendrierCours.Entites
             {
                 throw new ArgumentException("La date de debut doit etre inferieur a la date de fin");
             }
-            if (String.IsNullOrWhiteSpace(p_salle))
+            if (p_salle is null)
             {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide");
+                throw new ArgumentNullException("Ne doit pas etre null");
             }
 
             if (p_uid == Guid.Empty)
@@ -305,9 +267,9 @@ namespace CalendrierCours.Entites
             get { return this.m_salle; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
-                    throw new ArgumentException("Ne doit pas etre null ou vide");
+                    throw new ArgumentException("Ne doit pas etre null");
                 }
 
                 this.m_salle = value;
@@ -341,13 +303,13 @@ namespace CalendrierCours.Entites
         #region Ctor
         public Professeur(string p_nom, string p_prenom)
         {
-            if (String.IsNullOrWhiteSpace(p_nom))
+            if (p_nom is null)
             {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_nom));
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_nom));
             }
-            if (String.IsNullOrWhiteSpace(p_prenom))
+            if (p_prenom is null)
             {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide");
+                throw new ArgumentNullException("Ne doit pas etre null");
             }
 
             this.m_nom = p_nom;
@@ -361,9 +323,9 @@ namespace CalendrierCours.Entites
             get { return this.m_nom; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
-                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                    throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
                 this.m_nom = value;
@@ -374,9 +336,9 @@ namespace CalendrierCours.Entites
             get { return this.m_prenom; }
             set
             {
-                if (String.IsNullOrWhiteSpace(value))
+                if (value is null)
                 {
-                    throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(value));
+                    throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
                 this.m_prenom = value;

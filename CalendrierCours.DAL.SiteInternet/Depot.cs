@@ -264,7 +264,7 @@ namespace CalendrierCours.DAL.SiteInternet
                 }
                 else
                 {
-                    nvProf = new ProfesseurInternetDTO("-", "-");
+                    nvProf = new ProfesseurInternetDTO("", "");
                 }
 
                 nvCours = new CoursInternetDTO(nvProf, numeroCours, intituleCours);
@@ -272,9 +272,9 @@ namespace CalendrierCours.DAL.SiteInternet
             }
             else
             {
-                nvProf = new ProfesseurInternetDTO("-", "-");
-                nvCours = new CoursInternetDTO(nvProf, "000-000-SF", intituleCours);
-                nvSeance = new SeanceInternetDTO(p_dateDebut, p_dateFin, "-", Guid.NewGuid());
+                nvProf = new ProfesseurInternetDTO("", "");
+                nvCours = new CoursInternetDTO(nvProf, "", intituleCours);
+                nvSeance = new SeanceInternetDTO(p_dateDebut, p_dateFin, "", Guid.NewGuid());
             }
 
             nvCours.Seances.Add(nvSeance);

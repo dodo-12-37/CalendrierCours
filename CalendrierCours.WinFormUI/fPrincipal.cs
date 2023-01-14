@@ -19,6 +19,9 @@ namespace CalendrierCours.WinFormUI
         private Dictionary<int, CoursViewModelWinForm> m_coursCohorteCourante;
         private CoursViewModelWinForm m_coursCourant;
 
+        private System.Drawing.Color m_couleurMajOk = System.Drawing.Color.LimeGreen;
+        private System.Drawing.Color m_couleurMajAValider = System.Drawing.Color.Tomato;
+
         public string MessageInformation { get; set; }
 
         public fPrincipal(Application p_appli, IProprietes p_proprietes, List<CohorteViewModelWinForm> p_cohortes)
@@ -47,11 +50,6 @@ namespace CalendrierCours.WinFormUI
             p_cohortes.ForEach(c => this.m_cohortes.Add(compt++, c));
         }
 
-        private void tsmiQuitter_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
         private void fPrincipal_Load(object sender, EventArgs e)
         {
             this.lInformation.Text = MessageInformation;
@@ -61,7 +59,10 @@ namespace CalendrierCours.WinFormUI
                 this.lbCohortes.Items.Add(cohorte.Value.ToString());
             }
         }
-
+        private void tsmiQuitter_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
         private void lbCohortes_Click(object sender, EventArgs e)
         {
             CohorteViewModelWinForm cohorte;
@@ -90,7 +91,83 @@ namespace CalendrierCours.WinFormUI
 
             this.lInformation.Text = MessageInformation;
         }
+        private void lbCours_Click(object sender, EventArgs e)
+        {
+            CoursViewModelWinForm cours;
 
+            try
+            {
+                cours = this.m_coursCohorteCourante[this.lbCours.SelectedIndex];
+                this.m_coursCourant = cours;
+            }
+            catch (Exception)
+            {
+                cours = this.m_coursCourant;
+            }
+
+            if (cours is not null)
+            {
+                this.MiseAJourAfficheInformationCours(cours);
+                this.MiseAjourAffichageSeances(cours);
+            }
+        }
+        private void tbCours_TextChanged(object sender, EventArgs e)
+        {
+            ProfesseurViewModelWinForm enseignantModifie = 
+                new ProfesseurViewModelWinForm(this.tbNom.Text, this.tbPrenom.Text);
+            CoursViewModelWinForm coursModifie =
+                new CoursViewModelWinForm(enseignantModifie, this.tbNumero.Text, this.tbIntitule.Text);
+            coursModifie.Categorie = this.tbCategorie.Text;
+
+            if (!this.m_coursCourant.Equals(coursModifie) || this.m_coursCourant.Categorie != coursModifie.Categorie)
+            {
+                this.bmajCours.BackColor = this.m_couleurMajAValider;
+            }
+            else
+            {
+                this.bmajCours.BackColor = this.m_couleurMajOk;
+            }
+        }
+        private void bmajCours_Click(object sender, EventArgs e)
+        {
+            this.m_coursCourant.Numero = this.tbNumero.Text;
+            this.m_coursCourant.Intitule= this.tbIntitule.Text;
+            this.m_coursCourant.Categorie= this.tbCategorie.Text;
+            this.m_coursCourant.Enseignant.Nom = this.tbNom.Text;
+            this.m_coursCourant.Enseignant.Prenom = this.tbPrenom.Text;
+
+            this.bmajCours.BackColor = this.m_couleurMajOk;
+        }
+        private void bExportCours_Click(object sender, EventArgs e)
+        {
+            string chemin;
+            bool estExporte;
+
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "Fichier ICalendar (*.ics)|*.ics";
+            sfd.FileName = "Cours";
+
+            DialogResult dr = sfd.ShowDialog();
+
+            if (dr != DialogResult.Cancel)
+            {
+                chemin = sfd.FileName;
+                estExporte = this.m_appli.ExporterCours(new List<CoursViewModelWinForm>() { this.m_coursCourant }, chemin);
+            
+                if (estExporte)
+                {
+                    this.lInformation.Text = "Exportation réussie !";
+                }
+                else
+                {
+                    this.lInformation.Text = "Erreur dans l'exportation !";
+                }
+            }
+            else
+            {
+                this.lInformation.Text = "Exportation annulée !";
+            }
+        }
         private void MiseAJoursCoursCourant(CohorteViewModelWinForm p_cohorte)
         {
             int cmpt = 0;
@@ -120,26 +197,6 @@ namespace CalendrierCours.WinFormUI
             this.lbSeances.Items.Clear();
             p_cours.Seances.ForEach(s => this.lbSeances.Items.Add(s.ToString()));
         }
-
-        private void lbCours_Click(object sender, EventArgs e)
-        {
-            CoursViewModelWinForm cours;
-
-            try
-            {
-                cours = this.m_coursCohorteCourante[this.lbCours.SelectedIndex];
-                this.m_coursCourant = cours;
-            }
-            catch (Exception)
-            {
-                cours = this.m_coursCourant;
-            }
-
-            if (cours is not null)
-            {
-                this.MiseAJourAfficheInformationCours(cours);
-                this.MiseAjourAffichageSeances(cours);
-            }
-        }
+        
     }
 }

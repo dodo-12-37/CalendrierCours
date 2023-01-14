@@ -28,14 +28,29 @@ namespace CalendrierCours.DAL.ExportCoursICS
             {
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cours));
             }
-            if (String.IsNullOrWhiteSpace(p_chemin))
+            if (p_chemin is null)
             {
-                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_chemin));
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_chemin));
             }
 
-            List<CoursICSDTO> coursEport = p_cours.Select(c => new CoursICSDTO(c)).ToList();
+            List<CoursICSDTO> coursEport = p_cours.Select(c => 
+                {
+                    CoursICSDTO cours = new CoursICSDTO(c);
+                    cours.Categorie = c.Categorie;
+                    return cours;
+                })
+                .ToList();
+            string fichier;
 
-            string fichier = this.RetournerNomFichier(p_chemin);
+            if (p_chemin == String.Empty)
+            {
+                fichier = this.RetournerNomFichier();
+            }
+            else
+            {
+                fichier = p_chemin;
+            }
+
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(this.EcrireEntete());
 
@@ -46,10 +61,11 @@ namespace CalendrierCours.DAL.ExportCoursICS
             this.EcrireFichier(fichier, sb.ToString());
         }
 
-        private string RetournerNomFichier(string p_chemin)
+        private string RetournerNomFichier()
         {
             bool estDisponible = true;
-            string fichier = p_chemin + $"\\{NOM_FICHIER_ENREGISTREMENT}.ics";
+            string chemin = Directory.GetParent(AppContext.BaseDirectory).FullName;
+            string fichier = chemin + $"\\{NOM_FICHIER_ENREGISTREMENT}.ics";
 
             do
             {
@@ -60,7 +76,7 @@ namespace CalendrierCours.DAL.ExportCoursICS
                 }
                 else
                 {
-                    fichier = p_chemin + $"\\{NOM_FICHIER_ENREGISTREMENT}" + compteur + ".ics";
+                    fichier = chemin + $"\\{NOM_FICHIER_ENREGISTREMENT}" + compteur + ".ics";
                     compteur++;
                 }
 
@@ -88,7 +104,7 @@ namespace CalendrierCours.DAL.ExportCoursICS
 
             sb.AppendLine("BEGIN:VEVENT");
 
-            if (p_cours.Categorie is not null)
+            if (!String.IsNullOrEmpty(p_cours.Categorie))
             {
                 sb.AppendLine($"CATEGORIES:{p_cours.Categorie}");
             }
@@ -102,7 +118,10 @@ namespace CalendrierCours.DAL.ExportCoursICS
             sb.AppendLine($"LOCATION:{p_seance.Salle}");
 
             sb.Append("DESCRIPTION:");
-            sb.Append($"Cours donné par {p_cours.Enseignant.Prenom} {p_cours.Enseignant.Nom}");
+            if (!String.IsNullOrEmpty(p_cours.Enseignant.Nom) || !String.IsNullOrEmpty(p_cours.Enseignant.Prenom))
+            {
+                sb.Append($"Cours donné par {p_cours.Enseignant.Prenom} {p_cours.Enseignant.Nom}");
+            }
             if (p_cours.Description is not null)
             {
                 sb.AppendLine(p_cours.Description);
@@ -112,7 +131,14 @@ namespace CalendrierCours.DAL.ExportCoursICS
                 sb.AppendLine();
             }
 
-            sb.AppendLine($"SUMMARY;LANGUAGE={this.m_proprietes[PROPRIETE_LANGAGE]}:{p_cours.Numero} - {p_cours.Intitule}");
+            if (String.IsNullOrEmpty(p_cours.Numero))
+            {
+                sb.AppendLine($"SUMMARY;LANGUAGE={this.m_proprietes[PROPRIETE_LANGAGE]}:{p_cours.Intitule}");
+            }
+            else
+            {
+                sb.AppendLine($"SUMMARY;LANGUAGE={this.m_proprietes[PROPRIETE_LANGAGE]}:{p_cours.Numero} - {p_cours.Intitule}");
+            }
             sb.AppendLine($"UID:{p_seance.UID.ToString()}");
             sb.AppendLine($"END:VEVENT");
 

@@ -1,4 +1,5 @@
 ﻿using CalendrierCours.BL;
+using CalendrierCours.DAL.ExportCoursICS;
 using CalendrierCours.DAL.SiteInternet;
 using CalendrierCours.Entites;
 using System;
@@ -125,8 +126,37 @@ namespace CalendrierCours.WinFormUI
             return cours;
         }
 
+        public bool ExporterCours(List<CoursViewModelWinForm> p_cours, string p_chemin)
+        {
+            if (p_cours is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cours));
+            }
+            if (String.IsNullOrEmpty(p_chemin))
+            {
+                throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_chemin));
+            }
 
+            bool estExporte;
+            List<Cours> coursAExporter = p_cours.Select(cDTO => cDTO.VersEntites()).ToList();
+            IExportFichier export = this.RetournerExportFichier();
 
+            try
+            {
+                this.m_traitement.ExporterSeances(coursAExporter, export, p_chemin);
+                estExporte = true;
+            }
+            catch (Exception)
+            {
+                estExporte = false;
+            }
 
+            return estExporte;
+        }
+
+        private IExportFichier RetournerExportFichier()
+        {
+            return new ExportCoursICS(this.m_proprietes);
+        }
     }
 }

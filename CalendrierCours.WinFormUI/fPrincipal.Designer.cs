@@ -76,6 +76,7 @@
             this.lbCohortes.Size = new System.Drawing.Size(235, 293);
             this.lbCohortes.TabIndex = 1;
             this.lbCohortes.Click += new System.EventHandler(this.lbCohortes_Click);
+            this.lbCohortes.SelectedIndexChanged += new System.EventHandler(this.lbCohortes_Click);
             // 
             // msPrincipal
             // 
@@ -177,7 +178,7 @@
             this.bExportTousLesCours.Location = new System.Drawing.Point(421, 244);
             this.bExportTousLesCours.Name = "bExportTousLesCours";
             this.bExportTousLesCours.Size = new System.Drawing.Size(155, 33);
-            this.bExportTousLesCours.TabIndex = 17;
+            this.bExportTousLesCours.TabIndex = 10;
             this.bExportTousLesCours.Text = "Exporter les cours";
             this.bExportTousLesCours.UseVisualStyleBackColor = true;
             // 
@@ -196,7 +197,8 @@
             this.tbCategorie.Location = new System.Drawing.Point(343, 170);
             this.tbCategorie.Name = "tbCategorie";
             this.tbCategorie.Size = new System.Drawing.Size(235, 25);
-            this.tbCategorie.TabIndex = 14;
+            this.tbCategorie.TabIndex = 7;
+            this.tbCategorie.TextChanged += new System.EventHandler(this.tbCours_TextChanged);
             // 
             // bExportCours
             // 
@@ -207,9 +209,10 @@
             this.bExportCours.Location = new System.Drawing.Point(260, 244);
             this.bExportCours.Name = "bExportCours";
             this.bExportCours.Size = new System.Drawing.Size(155, 33);
-            this.bExportCours.TabIndex = 16;
+            this.bExportCours.TabIndex = 9;
             this.bExportCours.Text = "Exporter le cours";
             this.bExportCours.UseVisualStyleBackColor = true;
+            this.bExportCours.Click += new System.EventHandler(this.bExportCours_Click);
             // 
             // lCategorie
             // 
@@ -227,7 +230,8 @@
             this.tbPrenom.Location = new System.Drawing.Point(343, 135);
             this.tbPrenom.Name = "tbPrenom";
             this.tbPrenom.Size = new System.Drawing.Size(235, 25);
-            this.tbPrenom.TabIndex = 12;
+            this.tbPrenom.TabIndex = 6;
+            this.tbPrenom.TextChanged += new System.EventHandler(this.tbCours_TextChanged);
             // 
             // lPrenom
             // 
@@ -245,21 +249,22 @@
             this.tbNom.Location = new System.Drawing.Point(343, 100);
             this.tbNom.Name = "tbNom";
             this.tbNom.Size = new System.Drawing.Size(235, 25);
-            this.tbNom.TabIndex = 10;
+            this.tbNom.TabIndex = 5;
+            this.tbNom.TextChanged += new System.EventHandler(this.tbCours_TextChanged);
             // 
             // bmajCours
             // 
             this.bmajCours.AutoSize = true;
-            this.bmajCours.BackColor = System.Drawing.Color.LimeGreen;
             this.bmajCours.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.bmajCours.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bmajCours.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.bmajCours.Location = new System.Drawing.Point(352, 205);
             this.bmajCours.Name = "bmajCours";
             this.bmajCours.Size = new System.Drawing.Size(147, 33);
-            this.bmajCours.TabIndex = 13;
-            this.bmajCours.Text = "Mettre à jour";
+            this.bmajCours.TabIndex = 8;
+            this.bmajCours.Text = "&Mettre à jour";
             this.bmajCours.UseVisualStyleBackColor = false;
+            this.bmajCours.Click += new System.EventHandler(this.bmajCours_Click);
             // 
             // lNom
             // 
@@ -277,7 +282,8 @@
             this.tbIntitule.Location = new System.Drawing.Point(343, 65);
             this.tbIntitule.Name = "tbIntitule";
             this.tbIntitule.Size = new System.Drawing.Size(235, 25);
-            this.tbIntitule.TabIndex = 8;
+            this.tbIntitule.TabIndex = 4;
+            this.tbIntitule.TextChanged += new System.EventHandler(this.tbCours_TextChanged);
             // 
             // lIntitule
             // 
@@ -295,7 +301,8 @@
             this.tbNumero.Location = new System.Drawing.Point(343, 30);
             this.tbNumero.Name = "tbNumero";
             this.tbNumero.Size = new System.Drawing.Size(235, 25);
-            this.tbNumero.TabIndex = 4;
+            this.tbNumero.TabIndex = 3;
+            this.tbNumero.TextChanged += new System.EventHandler(this.tbCours_TextChanged);
             // 
             // lNumero
             // 
@@ -319,8 +326,9 @@
             this.lbCours.Location = new System.Drawing.Point(3, 26);
             this.lbCours.Name = "lbCours";
             this.lbCours.Size = new System.Drawing.Size(251, 293);
-            this.lbCours.TabIndex = 1;
+            this.lbCours.TabIndex = 2;
             this.lbCours.Click += new System.EventHandler(this.lbCours_Click);
+            this.lbCours.SelectedIndexChanged += new System.EventHandler(this.lbCours_Click);
             // 
             // lCours
             // 
@@ -356,7 +364,7 @@
             this.lbSeances.Location = new System.Drawing.Point(3, 30);
             this.lbSeances.Name = "lbSeances";
             this.lbSeances.Size = new System.Drawing.Size(223, 293);
-            this.lbSeances.TabIndex = 1;
+            this.lbSeances.TabIndex = 11;
             // 
             // lSeances
             // 

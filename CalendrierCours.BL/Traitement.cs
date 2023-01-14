@@ -37,7 +37,7 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_chemin));
             }
 
-            //this.MiseAJourCache(p_cohorte);
+            this.MiseAJourCache(p_cohorte);
 
             if (p_date is null)
             {
@@ -45,9 +45,13 @@ namespace CalendrierCours.BL
             }
 
             List<Cours> listeExport = this.ListerCours(p_cohorte)
-                .Select(c => new Cours(c.Enseignant, c.Numero, c.Intitule, c.Seances
+                .Select(c => {
+                    Cours nvCours = new Cours(c.Enseignant, c.Numero, c.Intitule, c.Seances
                     .Where(s => s.DateDebut >= p_date)
-                    .ToList()))
+                    .ToList());
+                    nvCours.Categorie = c.Categorie;
+                    return nvCours;
+                })
                 .ToList();
 
             p_typeExport.ExporterVersFichier(listeExport, p_chemin);
@@ -71,7 +75,7 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_chemin));
             }
 
-            //this.MiseAJourCache(p_cohorte);
+            this.MiseAJourCache(p_cohorte);
 
             if (p_date is null)
             {
@@ -80,9 +84,45 @@ namespace CalendrierCours.BL
 
             List<Cours> listeExport = this.ListerCours(p_cohorte)
                 .Where(c => c.Enseignant.Equals(p_professeur))
-                .Select(c => new Cours(c.Enseignant, c.Numero, c.Intitule, c.Seances
+                .Select(c => {
+                    Cours nvCours = new Cours(c.Enseignant, c.Numero, c.Intitule, c.Seances
                     .Where(s => s.DateDebut >= p_date)
-                    .ToList()))
+                    .ToList());
+                    nvCours.Categorie = c.Categorie;
+                    return nvCours;
+                })
+                .ToList();
+
+            p_typeExport.ExporterVersFichier(listeExport, p_chemin);
+        }
+        public void ExporterSeances(List<Cours> p_cours, IExportFichier p_typeExport, string p_chemin, DateTime? p_date = null)
+        {
+            if (p_cours is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cours));
+            }
+            if (p_typeExport is null)
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_typeExport));
+            }
+            if (String.IsNullOrWhiteSpace(p_chemin))
+            {
+                throw new ArgumentNullException("Ne doit pas etre null", nameof(p_chemin));
+            }
+
+            if (p_date is null)
+            {
+                p_date = DateTime.Now;
+            }
+
+            List<Cours> listeExport = p_cours
+                .Select(c => {
+                    Cours nvCours = new Cours(c.Enseignant, c.Numero, c.Intitule, c.Seances
+                    .Where(s => s.DateDebut >= p_date)
+                    .ToList());
+                    nvCours.Categorie = c.Categorie;
+                    return nvCours;
+                })
                 .ToList();
 
             p_typeExport.ExporterVersFichier(listeExport, p_chemin);
