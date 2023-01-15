@@ -1,4 +1,4 @@
-# Script de deploiement de CalendrierCours
+# Script de deploiement de CalendrierCours V2.0
 # Version 2.0
 # Simon Quillaud
 # Janvier 2023
