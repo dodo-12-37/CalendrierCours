@@ -132,6 +132,8 @@ namespace CalendrierCours.WinFormUI
             : this(new ProfesseurViewModelWinForm(p_cours.Enseignant), p_cours.Numero, p_cours.Intitule
                   , p_cours.Seances.Select(s => new SeanceViewModelWinForm(s)).ToList())
         { }
+        public CoursViewModelWinForm() : this(new ProfesseurViewModelWinForm(String.Empty, String.Empty), String.Empty, String.Empty)
+        { }
         #endregion
 
         #region Proprietes

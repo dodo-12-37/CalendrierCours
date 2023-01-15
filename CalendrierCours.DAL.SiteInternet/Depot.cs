@@ -1,6 +1,6 @@
-﻿using System.Net;
+﻿using CalendrierCours.Entites;
+using System.Net;
 using System.Text.RegularExpressions;
-using CalendrierCours.Entites;
 
 namespace CalendrierCours.DAL.SiteInternet
 {
@@ -37,28 +37,28 @@ namespace CalendrierCours.DAL.SiteInternet
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_proprietes));
             }
 
-            this.m_proprietes = p_proprietes;
+            m_proprietes = p_proprietes;
 
-            this.m_urlSiteCsfoy = this.m_proprietes[PROPRIETE_URL_SITE_INTERNET];
-            this.m_urlSiteCsfoyCohorte = this.m_proprietes[PROPRIETE_URL_SITE_AVEC_COHORTE];
+            m_urlSiteCsfoy = m_proprietes[PROPRIETE_URL_SITE_INTERNET];
+            m_urlSiteCsfoyCohorte = m_proprietes[PROPRIETE_URL_SITE_AVEC_COHORTE];
         }
         #endregion
 
         #region Methodes
         public List<Cohorte> RecupererCohortes()
         {
-            string? contenuInternet = this.RecupererContenuSite();
+            string? contenuInternet = RecupererContenuSite();
 
             if (String.IsNullOrEmpty(contenuInternet))
             {
                 throw new WebException("Site internet non accessible");
             }
 
-            List<string> lignesContenuInternet = this.CouperLignesTexte(contenuInternet);
+            List<string> lignesContenuInternet = CouperLignesTexte(contenuInternet);
             List<Cohorte> listeRetour = new List<Cohorte>();
 
             listeRetour = lignesContenuInternet
-                .Where(str => str.Contains(this.m_proprietes[PROPRIETE_FORMAT_LISTE_COHORTE]))
+                .Where(str => str.Contains(m_proprietes[PROPRIETE_FORMAT_LISTE_COHORTE]))
                 .Select(str =>
                 {
                     string[] valeurs = str.Split("\"");
@@ -86,14 +86,14 @@ namespace CalendrierCours.DAL.SiteInternet
 
             try
             {
-                listeCours = this.TransformerLignesEnCoursInternetDTO(lignesContenuInternet);
+                listeCours = TransformerLignesEnCoursInternetDTO(lignesContenuInternet);
             }
             catch (Exception e)
             {
                 throw new InvalidDepotException("Erreur dans l'interprétation du contenu du site", e);
             }
 
-            listeCours = this.ChangerIntitules(listeCours);
+            listeCours = ChangerIntitules(listeCours);
 
             return listeCours
                 .Select(cDTO => cDTO.VersEntites())
@@ -127,7 +127,7 @@ namespace CalendrierCours.DAL.SiteInternet
 
         private List<CoursInternetDTO> ChangerIntitules(List<CoursInternetDTO> p_liste)
         {
-            Dictionary<string, string> listeCours = this.RecupererListeCours();
+            Dictionary<string, string> listeCours = RecupererListeCours();
 
             foreach (CoursInternetDTO c in p_liste)
             {
@@ -156,12 +156,12 @@ namespace CalendrierCours.DAL.SiteInternet
             string gpHeure = "h", gpMinute = "m", gpSemaine = "s", gpTaille = "t";
 
             Regex formatHeures =
-                new Regex($"(?<{gpHeure}>{this.m_proprietes[PROPRIETE_FORMAT_HEURES]})" +
-                $"{this.m_proprietes[PROPRIETE_FORMAT_SEPARATEUR_HEURE]}(?<{gpMinute}>{this.m_proprietes[PROPRIETE_FORMAT_MINUTES]})");
-            Regex formatSemaines = new Regex($"(?<{gpSemaine}>{this.m_proprietes[PROPRIETE_FORMAT_SEMAINE]})");
-            Regex formatLigneCours = new Regex(this.m_proprietes[PROPRIETE_FORMAT_LIGNE_COURS]);
-            Regex formatLigneVide = new Regex(this.m_proprietes[PROPRIETE_FORMAT_LIGNE_VIDE]);
-            Regex formatHauteurCase = new Regex($"(?<{gpTaille}>{this.m_proprietes[PROPRIETE_FORMAT_HAUTEUR_CASE]})px");
+                new Regex($"(?<{gpHeure}>{m_proprietes[PROPRIETE_FORMAT_HEURES]})" +
+                $"{m_proprietes[PROPRIETE_FORMAT_SEPARATEUR_HEURE]}(?<{gpMinute}>{m_proprietes[PROPRIETE_FORMAT_MINUTES]})");
+            Regex formatSemaines = new Regex($"(?<{gpSemaine}>{m_proprietes[PROPRIETE_FORMAT_SEMAINE]})");
+            Regex formatLigneCours = new Regex(m_proprietes[PROPRIETE_FORMAT_LIGNE_COURS]);
+            Regex formatLigneVide = new Regex(m_proprietes[PROPRIETE_FORMAT_LIGNE_VIDE]);
+            Regex formatHauteurCase = new Regex($"(?<{gpTaille}>{m_proprietes[PROPRIETE_FORMAT_HAUTEUR_CASE]})px");
 
             int compteurHeure = -1;
             int tailleHeure = -1;
@@ -204,7 +204,7 @@ namespace CalendrierCours.DAL.SiteInternet
                     int tempsCours = int.Parse(formatHauteurCase.Match(ligne).Groups[gpTaille].Value) / tailleHeure;
                     DateTime dateFin = horaires[horaires.Count - compteurHeure + tempsCours];
 
-                    CoursInternetDTO nvCours = this.TransformerLigneNouvelleSeance(ligne, dateDebut, dateFin);
+                    CoursInternetDTO nvCours = TransformerLigneNouvelleSeance(ligne, dateDebut, dateFin);
                     CoursInternetDTO? coursExistant = listeRetour.SingleOrDefault(c => c.Equals(nvCours));
 
                     if (coursExistant != default)
@@ -235,11 +235,11 @@ namespace CalendrierCours.DAL.SiteInternet
         {
             string gpInfos = "i", gpNumero = "n";
 
-            Regex regexSeance = new Regex($"\">(?<{gpInfos}>{this.m_proprietes[PROPRIETE_FORMAT_LIGNE_SEANCE]})");
-            Regex regexNumeroCours = new Regex($"(?<{gpNumero}>{this.m_proprietes[PROPRIETE_FORMAT_NUMERO_COURS]})");
+            Regex regexSeance = new Regex($"\">(?<{gpInfos}>{m_proprietes[PROPRIETE_FORMAT_LIGNE_SEANCE]})");
+            Regex regexNumeroCours = new Regex($"(?<{gpNumero}>{m_proprietes[PROPRIETE_FORMAT_NUMERO_COURS]})");
             int positionIntitule = 0, positionNumero = 1, positionProf = 2, positionSalle = 3;
             int PositionNomProf = 0, positionPrenomProf = 1;
-            
+
             ProfesseurInternetDTO nvProf;
             CoursInternetDTO nvCours;
             SeanceInternetDTO nvSeance;
@@ -287,8 +287,8 @@ namespace CalendrierCours.DAL.SiteInternet
             Dictionary<string, string> retour = new Dictionary<string, string>();
             string contenu;
 
-            string fichier = this.m_proprietes[PROPRIETE_FICHIER_LISTE_COURS];
-            string separateur = this.m_proprietes[PROPRIETE_SEPARATEUR_LISTE_COURS];
+            string fichier = m_proprietes[PROPRIETE_FICHIER_LISTE_COURS];
+            string separateur = m_proprietes[PROPRIETE_SEPARATEUR_LISTE_COURS];
 
             if (File.Exists(fichier))
             {
@@ -297,7 +297,7 @@ namespace CalendrierCours.DAL.SiteInternet
                     contenu = sr.ReadToEnd();
                 }
 
-                List<string> contenuCoupe = this.CouperLignesTexte(contenu);
+                List<string> contenuCoupe = CouperLignesTexte(contenu);
                 contenuCoupe.ForEach(l =>
                 {
                     string[] infos = l.Split(separateur);

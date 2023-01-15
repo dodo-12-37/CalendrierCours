@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Text.RegularExpressions;
-
-namespace CalendrierCours.Entites
+﻿namespace CalendrierCours.Entites
 {
     public class Cohorte
     {
@@ -18,8 +15,8 @@ namespace CalendrierCours.Entites
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
             }
 
-            this.m_numero = p_numero;
-            this.m_listeCours = new List<Cours>();
+            m_numero = p_numero;
+            m_listeCours = new List<Cours>();
         }
         public Cohorte(List<Cours> p_listeCours, string p_numero)
         {
@@ -32,8 +29,8 @@ namespace CalendrierCours.Entites
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
             }
 
-            this.m_listeCours = p_listeCours;
-            this.m_numero = p_numero;
+            m_listeCours = p_listeCours;
+            m_numero = p_numero;
         }
         #endregion
 
@@ -42,8 +39,8 @@ namespace CalendrierCours.Entites
         {
             get
             {
-                Cours[] listeRetour = new Cours[this.m_listeCours.Count];
-                this.m_listeCours.CopyTo(listeRetour);
+                Cours[] listeRetour = new Cours[m_listeCours.Count];
+                m_listeCours.CopyTo(listeRetour);
                 return listeRetour.ToList();
             }
             set
@@ -52,19 +49,19 @@ namespace CalendrierCours.Entites
                 {
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
-                this.m_listeCours = value;
+                m_listeCours = value;
             }
         }
         public string Numero
         {
-            get { return this.m_numero; }
+            get { return m_numero; }
             set
             {
                 if (String.IsNullOrWhiteSpace(value))
                 {
                     throw new ArgumentNullException("Ne doit pas etre null ou vide");
                 }
-                this.m_numero = value;
+                m_numero = value;
             }
         }
         #endregion
@@ -73,11 +70,11 @@ namespace CalendrierCours.Entites
         public override bool Equals(object? obj)
         {
             return obj is Cohorte cohorte
-                && cohorte.m_numero == this.m_numero;
+                && cohorte.m_numero == m_numero;
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.m_numero);
+            return HashCode.Combine(m_numero);
         }
         #endregion
     }
@@ -114,19 +111,19 @@ namespace CalendrierCours.Entites
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_seances));
             }
 
-            this.m_enseignant = p_enseignant;
-            this.m_seances = p_seances;
-            this.m_intitule = p_intitule;
-            this.m_numero = p_numero;
-            this.m_description = null;
-            this.m_categorie = null;
+            m_enseignant = p_enseignant;
+            m_seances = p_seances;
+            m_intitule = p_intitule;
+            m_numero = p_numero;
+            m_description = null;
+            m_categorie = null;
         }
         #endregion
 
         #region Proprietes
         public Professeur Enseignant
         {
-            get { return this.m_enseignant; }
+            get { return m_enseignant; }
             set
             {
                 if (value is null)
@@ -134,15 +131,15 @@ namespace CalendrierCours.Entites
                     throw new ArgumentNullException("Ne doit pas etre null");
                 }
 
-                this.m_enseignant = value;
+                m_enseignant = value;
             }
         }
         public List<Seance> Seances
         {
             get
             {
-                Seance[] seanceRetour = new Seance[this.m_seances.Count];
-                this.m_seances.CopyTo(seanceRetour);
+                Seance[] seanceRetour = new Seance[m_seances.Count];
+                m_seances.CopyTo(seanceRetour);
                 return seanceRetour.ToList();
             }
             set
@@ -152,12 +149,12 @@ namespace CalendrierCours.Entites
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_seances = value;
+                m_seances = value;
             }
         }
         public string Intitule
         {
-            get { return this.m_intitule; }
+            get { return m_intitule; }
             set
             {
                 if (value is null)
@@ -165,12 +162,12 @@ namespace CalendrierCours.Entites
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_intitule = value;
+                m_intitule = value;
             }
         }
         public string Numero
         {
-            get { return this.m_numero; }
+            get { return m_numero; }
             set
             {
                 if (value is null)
@@ -178,18 +175,18 @@ namespace CalendrierCours.Entites
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_intitule = value;
+                m_intitule = value;
             }
         }
-        public string? Description { get { return this.m_description; } set { this.m_description = value; } }
-        public string? Categorie { get { return this.m_categorie; } set { this.m_categorie = value; } }
+        public string? Description { get { return m_description; } set { m_description = value; } }
+        public string? Categorie { get { return m_categorie; } set { m_categorie = value; } }
         #endregion
 
         #region Methodes
         public override bool Equals(object? obj)
         {
             return obj is Cours cours
-                && this.Enseignant.Equals(cours.Enseignant)
+                && Enseignant.Equals(cours.Enseignant)
                 && Numero == cours.Numero
                 && Intitule == cours.Intitule;
         }
@@ -222,49 +219,49 @@ namespace CalendrierCours.Entites
 
             if (p_uid == Guid.Empty)
             {
-                this.m_uid = Guid.NewGuid();
+                m_uid = Guid.NewGuid();
             }
             else
             {
-                this.m_uid = p_uid;
+                m_uid = p_uid;
             }
 
-            this.m_dateDebut = p_dateDebut;
-            this.m_dateFin = p_dateFin;
-            this.m_salle = p_salle;
+            m_dateDebut = p_dateDebut;
+            m_dateFin = p_dateFin;
+            m_salle = p_salle;
         }
         #endregion
 
         #region Proprietes
         public DateTime DateDebut
         {
-            get { return this.m_dateDebut; }
+            get { return m_dateDebut; }
             set
             {
-                if (value >= this.m_dateFin)
+                if (value >= m_dateFin)
                 {
                     throw new ArgumentException("La date de debut doit etre inferieur a la date de fin");
                 }
 
-                this.m_dateDebut = value;
+                m_dateDebut = value;
             }
         }
         public DateTime DateFin
         {
-            get { return this.m_dateFin; }
+            get { return m_dateFin; }
             set
             {
-                if (value <= this.m_dateDebut)
+                if (value <= m_dateDebut)
                 {
                     throw new ArgumentException("La date de debut doit etre inferieur a la date de fin");
                 }
 
-                this.m_dateFin = value;
+                m_dateFin = value;
             }
         }
         public string Salle
         {
-            get { return this.m_salle; }
+            get { return m_salle; }
             set
             {
                 if (value is null)
@@ -272,20 +269,20 @@ namespace CalendrierCours.Entites
                     throw new ArgumentException("Ne doit pas etre null");
                 }
 
-                this.m_salle = value;
+                m_salle = value;
             }
         }
-        public Guid UID { get { return this.m_uid; } }
+        public Guid UID { get { return m_uid; } }
         #endregion
 
         #region Methodes
         public override bool Equals(object? obj)
         {
             return obj is Seance seance
-                && seance.UID == this.UID
-                && seance.DateDebut == this.DateDebut
-                && seance.DateFin == this.DateFin
-                && seance.Salle == this.Salle;
+                && seance.UID == UID
+                && seance.DateDebut == DateDebut
+                && seance.DateFin == DateFin
+                && seance.Salle == Salle;
         }
         public override int GetHashCode()
         {
@@ -312,15 +309,15 @@ namespace CalendrierCours.Entites
                 throw new ArgumentNullException("Ne doit pas etre null");
             }
 
-            this.m_nom = p_nom;
-            this.m_prenom = p_prenom;
+            m_nom = p_nom;
+            m_prenom = p_prenom;
         }
         #endregion
 
         #region Proprietes
         public string Nom
         {
-            get { return this.m_nom; }
+            get { return m_nom; }
             set
             {
                 if (value is null)
@@ -328,12 +325,12 @@ namespace CalendrierCours.Entites
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_nom = value;
+                m_nom = value;
             }
         }
         public string Prenom
         {
-            get { return this.m_prenom; }
+            get { return m_prenom; }
             set
             {
                 if (value is null)
@@ -341,7 +338,7 @@ namespace CalendrierCours.Entites
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_prenom = value;
+                m_prenom = value;
             }
         }
         #endregion

@@ -9,11 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalendrierCours.DAL.SiteInt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalendrierCours.BL", "CalendrierCours.BL\CalendrierCours.BL.csproj", "{8BB3A593-9223-46B8-AD3F-904FF74F7E41}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalendrierCours.ConsoleUI", "CalendrierCours.ConsoleUI\CalendrierCours.ConsoleUI.csproj", "{23718A30-4253-4190-BD5E-19F8B4D823F9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalendrierCours.DAL.ExportCoursICS", "CalendrierCours.DAL.ExportCoursICS\CalendrierCours.DAL.ExportCoursICS.csproj", "{4E619E89-B9EA-440C-BA11-654EA6E122AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalendrierCours.WinFormUI", "CalendrierCours.WinFormUI\CalendrierCours.WinFormUI.csproj", "{D1429214-94EF-4E38-9CC4-E85AB9C6CC07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalendrierCours.WinFormUI", "CalendrierCours.WinFormUI\CalendrierCours.WinFormUI.csproj", "{D1429214-94EF-4E38-9CC4-E85AB9C6CC07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +31,6 @@ Global
 		{8BB3A593-9223-46B8-AD3F-904FF74F7E41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BB3A593-9223-46B8-AD3F-904FF74F7E41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BB3A593-9223-46B8-AD3F-904FF74F7E41}.Release|Any CPU.Build.0 = Release|Any CPU
-		{23718A30-4253-4190-BD5E-19F8B4D823F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{23718A30-4253-4190-BD5E-19F8B4D823F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{23718A30-4253-4190-BD5E-19F8B4D823F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{23718A30-4253-4190-BD5E-19F8B4D823F9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4E619E89-B9EA-440C-BA11-654EA6E122AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4E619E89-B9EA-440C-BA11-654EA6E122AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E619E89-B9EA-440C-BA11-654EA6E122AE}.Release|Any CPU.ActiveCfg = Release|Any CPU

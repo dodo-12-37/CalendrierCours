@@ -17,7 +17,7 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_depot));
             }
 
-            this.m_depot = p_depot;
+            m_depot = p_depot;
         }
         #endregion
 
@@ -37,15 +37,16 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_chemin));
             }
 
-            this.MiseAJourCache(p_cohorte);
+            MiseAJourCache(p_cohorte);
 
             if (p_date is null)
             {
                 p_date = DateTime.Now;
             }
 
-            List<Cours> listeExport = this.ListerCours(p_cohorte)
-                .Select(c => {
+            List<Cours> listeExport = ListerCours(p_cohorte)
+                .Select(c =>
+                {
                     Cours nvCours = new Cours(c.Enseignant, c.Numero, c.Intitule, c.Seances
                     .Where(s => s.DateDebut >= p_date)
                     .ToList());
@@ -75,16 +76,17 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_chemin));
             }
 
-            this.MiseAJourCache(p_cohorte);
+            MiseAJourCache(p_cohorte);
 
             if (p_date is null)
             {
                 p_date = DateTime.Now;
             }
 
-            List<Cours> listeExport = this.ListerCours(p_cohorte)
+            List<Cours> listeExport = ListerCours(p_cohorte)
                 .Where(c => c.Enseignant.Equals(p_professeur))
-                .Select(c => {
+                .Select(c =>
+                {
                     Cours nvCours = new Cours(c.Enseignant, c.Numero, c.Intitule, c.Seances
                     .Where(s => s.DateDebut >= p_date)
                     .ToList());
@@ -116,7 +118,8 @@ namespace CalendrierCours.BL
             }
 
             List<Cours> listeExport = p_cours
-                .Select(c => {
+                .Select(c =>
+                {
                     Cours nvCours = new Cours(c.Enseignant, c.Numero, c.Intitule, c.Seances
                     .Where(s => s.DateDebut >= p_date)
                     .ToList());
@@ -133,7 +136,7 @@ namespace CalendrierCours.BL
 
             try
             {
-                listeCohortes = this.m_depot.RecupererCohortes();
+                listeCohortes = m_depot.RecupererCohortes();
             }
             catch (Exception)
             {
@@ -149,7 +152,7 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cohorte));
             }
 
-            this.MiseAJourCache(p_cohorte);
+            MiseAJourCache(p_cohorte);
 
             return Cache.Cohorte.Cours;
         }
@@ -164,10 +167,10 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cours));
             }
 
-            this.MiseAJourCache(p_cohorte);
+            MiseAJourCache(p_cohorte);
 
             List<Seance> seancesRetour = new List<Seance>();
-            this.ListerCours(p_cohorte);
+            ListerCours(p_cohorte);
 
             if (Cache.Cohorte.Cours.Contains(p_cours))
             {
@@ -187,14 +190,14 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_cours));
             }
 
-            this.MiseAJourCache(p_cohorte);
+            MiseAJourCache(p_cohorte);
 
             if (p_date is null)
             {
                 p_date = DateTime.Now;
             }
 
-            List<Seance> seancesRetour = this.ListerSeances(p_cohorte, p_cours);
+            List<Seance> seancesRetour = ListerSeances(p_cohorte, p_cours);
 
             return seancesRetour.Where(s => s.DateDebut >= p_date).ToList();
         }
@@ -209,14 +212,14 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_professeur));
             }
 
-            this.MiseAJourCache(p_cohorte);
+            MiseAJourCache(p_cohorte);
 
             if (p_date is null)
             {
                 p_date = DateTime.Now;
             }
 
-            List<Cours> cours = this.ListerCours(p_cohorte).Where(c => c.Enseignant.Equals(p_professeur)).ToList();
+            List<Cours> cours = ListerCours(p_cohorte).Where(c => c.Enseignant.Equals(p_professeur)).ToList();
             List<Seance> seancesRetour = cours
                 .SelectMany(c => c.Seances
                     .Where(s => s.DateDebut >= p_date))
@@ -239,7 +242,7 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_intitule));
             }
 
-            this.MiseAJourCache(p_cohorte);
+            MiseAJourCache(p_cohorte);
 
             Cours coursAChanger = Cache.Cohorte.Cours.SingleOrDefault(c => c.Equals(p_cours));
 
@@ -270,7 +273,7 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_nom));
             }
 
-            this.MiseAJourCache(p_cohorte);
+            MiseAJourCache(p_cohorte);
 
             List<Cours> cours = Cache.Cohorte.Cours.Where(c => c.Enseignant.Equals(p_enseignant)).ToList();
 
@@ -291,7 +294,7 @@ namespace CalendrierCours.BL
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_prenom));
             }
 
-            this.MiseAJourCache(p_cohorte);
+            MiseAJourCache(p_cohorte);
 
             List<Cours> cours = Cache.Cohorte.Cours.Where(c => c.Enseignant.Equals(p_enseignant)).ToList();
 
@@ -309,7 +312,7 @@ namespace CalendrierCours.BL
                 Cache.Cohorte = p_cohorte;
                 try
                 {
-                    Cache.Cohorte.Cours = this.m_depot.RecupererCours(p_cohorte);
+                    Cache.Cohorte.Cours = m_depot.RecupererCours(p_cohorte);
                 }
                 catch (Exception)
                 {

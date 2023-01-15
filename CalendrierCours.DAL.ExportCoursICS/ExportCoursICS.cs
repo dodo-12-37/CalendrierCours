@@ -33,7 +33,7 @@ namespace CalendrierCours.DAL.ExportCoursICS
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_chemin));
             }
 
-            List<CoursICSDTO> coursEport = p_cours.Select(c => 
+            List<CoursICSDTO> coursEport = p_cours.Select(c =>
                 {
                     CoursICSDTO cours = new CoursICSDTO(c);
                     cours.Categorie = c.Categorie;
@@ -44,7 +44,7 @@ namespace CalendrierCours.DAL.ExportCoursICS
 
             if (p_chemin == String.Empty)
             {
-                fichier = this.RetournerNomFichier();
+                fichier = RetournerNomFichier();
             }
             else
             {
@@ -52,13 +52,13 @@ namespace CalendrierCours.DAL.ExportCoursICS
             }
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine(this.EcrireEntete());
+            sb.AppendLine(EcrireEntete());
 
-            coursEport.ForEach(c => c.Seances.ForEach(s => sb.AppendLine(this.EcrireSeance(c, s))));
-            
+            coursEport.ForEach(c => c.Seances.ForEach(s => sb.AppendLine(EcrireSeance(c, s))));
+
             sb.AppendLine("END:VCALENDAR");
 
-            this.EcrireFichier(fichier, sb.ToString());
+            EcrireFichier(fichier, sb.ToString());
         }
 
         private string RetournerNomFichier()
@@ -91,7 +91,7 @@ namespace CalendrierCours.DAL.ExportCoursICS
             sb.AppendLine("BEGIN:VCALENDAR");
             sb.AppendLine("VERSION:2.0");
             sb.AppendLine("BEGIN:VTIMEZONE");
-            sb.AppendLine($"TZID:{this.m_proprietes[PROPRIETE_VTIMEZONE]}");
+            sb.AppendLine($"TZID:{m_proprietes[PROPRIETE_VTIMEZONE]}");
             sb.AppendLine("END:VTIMEZONE");
 
             return sb.ToString();
@@ -109,10 +109,10 @@ namespace CalendrierCours.DAL.ExportCoursICS
                 sb.AppendLine($"CATEGORIES:{p_cours.Categorie}");
             }
 
-            sb.Append($"DTSTART;TZID=\"{this.m_proprietes[PROPRIETE_VTIMEZONE]}\":");
+            sb.Append($"DTSTART;TZID=\"{m_proprietes[PROPRIETE_VTIMEZONE]}\":");
             sb.Append($"{dateDebut.ToString("yyyyMMdd")}T");
             sb.AppendLine($"{dateDebut.ToString("HHmmss")}");
-            sb.Append($"DTEND;TZID=\"{this.m_proprietes[PROPRIETE_VTIMEZONE]}\":");
+            sb.Append($"DTEND;TZID=\"{m_proprietes[PROPRIETE_VTIMEZONE]}\":");
             sb.Append($"{dateFin.ToString("yyyyMMdd")}T");
             sb.AppendLine($"{dateFin.ToString("HHmmss")}");
             sb.AppendLine($"LOCATION:{p_seance.Salle}");
@@ -133,11 +133,11 @@ namespace CalendrierCours.DAL.ExportCoursICS
 
             if (String.IsNullOrEmpty(p_cours.Numero))
             {
-                sb.AppendLine($"SUMMARY;LANGUAGE={this.m_proprietes[PROPRIETE_LANGAGE]}:{p_cours.Intitule}");
+                sb.AppendLine($"SUMMARY;LANGUAGE={m_proprietes[PROPRIETE_LANGAGE]}:{p_cours.Intitule}");
             }
             else
             {
-                sb.AppendLine($"SUMMARY;LANGUAGE={this.m_proprietes[PROPRIETE_LANGAGE]}:{p_cours.Numero} - {p_cours.Intitule}");
+                sb.AppendLine($"SUMMARY;LANGUAGE={m_proprietes[PROPRIETE_LANGAGE]}:{p_cours.Numero} - {p_cours.Intitule}");
             }
             sb.AppendLine($"UID:{p_seance.UID.ToString()}");
             sb.AppendLine($"END:VEVENT");

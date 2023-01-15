@@ -31,8 +31,6 @@
             this.lbCohortes = new System.Windows.Forms.ListBox();
             this.msPrincipal = new System.Windows.Forms.MenuStrip();
             this.tsmiFichier = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiPreferences = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiQuitter = new System.Windows.Forms.ToolStripMenuItem();
             this.lCohortes = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -91,29 +89,16 @@
             // tsmiFichier
             // 
             this.tsmiFichier.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsmiPreferences,
-            this.toolStripSeparator1,
             this.tsmiQuitter});
             this.tsmiFichier.Name = "tsmiFichier";
             this.tsmiFichier.Size = new System.Drawing.Size(54, 20);
             this.tsmiFichier.Text = "&Fichier";
             // 
-            // tsmiPreferences
-            // 
-            this.tsmiPreferences.Name = "tsmiPreferences";
-            this.tsmiPreferences.Size = new System.Drawing.Size(153, 22);
-            this.tsmiPreferences.Text = "&Préférences";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(150, 6);
-            // 
             // tsmiQuitter
             // 
             this.tsmiQuitter.Name = "tsmiQuitter";
             this.tsmiQuitter.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.tsmiQuitter.Size = new System.Drawing.Size(153, 22);
+            this.tsmiQuitter.Size = new System.Drawing.Size(180, 22);
             this.tsmiQuitter.Text = "&Quitter";
             this.tsmiQuitter.Click += new System.EventHandler(this.tsmiQuitter_Click);
             // 
@@ -181,6 +166,7 @@
             this.bExportTousLesCours.TabIndex = 10;
             this.bExportTousLesCours.Text = "Exporter les cours";
             this.bExportTousLesCours.UseVisualStyleBackColor = true;
+            this.bExportTousLesCours.Click += new System.EventHandler(this.bExportTousLesCours_Click);
             // 
             // lInformation
             // 
@@ -408,8 +394,6 @@
 
         private MenuStrip msPrincipal;
         private ToolStripMenuItem tsmiFichier;
-        private ToolStripMenuItem tsmiPreferences;
-        private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem tsmiQuitter;
         private ListBox lbCohortes;
         private Label lCohortes;

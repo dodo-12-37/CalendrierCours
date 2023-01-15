@@ -1,6 +1,4 @@
 ﻿using CalendrierCours.Entites;
-using Microsoft.Extensions.Configuration;
-using System.Text.RegularExpressions;
 
 namespace CalendrierCours.DAL.SiteInternet
 {
@@ -19,8 +17,8 @@ namespace CalendrierCours.DAL.SiteInternet
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
             }
 
-            this.Numero = p_numero;
-            this.m_listeCours = new List<CoursInternetDTO>();
+            Numero = p_numero;
+            m_listeCours = new List<CoursInternetDTO>();
         }
         public CohorteInternetDTO(List<Cours> p_listeCours, string p_numero)
         {
@@ -33,8 +31,8 @@ namespace CalendrierCours.DAL.SiteInternet
                 throw new ArgumentNullException("Ne doit pas etre null ou vide", nameof(p_numero));
             }
 
-            this.m_listeCours = p_listeCours.Select(c => new CoursInternetDTO(c)).ToList();
-            this.m_numero = p_numero;
+            m_listeCours = p_listeCours.Select(c => new CoursInternetDTO(c)).ToList();
+            m_numero = p_numero;
         }
         public CohorteInternetDTO(Cohorte p_cohorte) : this(p_cohorte.Cours, p_cohorte.Numero) { }
         #endregion
@@ -44,7 +42,7 @@ namespace CalendrierCours.DAL.SiteInternet
         {
             get
             {
-                return this.m_listeCours;
+                return m_listeCours;
             }
             set
             {
@@ -52,19 +50,19 @@ namespace CalendrierCours.DAL.SiteInternet
                 {
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
-                this.m_listeCours = value;
+                m_listeCours = value;
             }
         }
         public string Numero
         {
-            get { return this.m_numero; }
+            get { return m_numero; }
             set
             {
                 if (String.IsNullOrWhiteSpace(value))
                 {
                     throw new ArgumentNullException("Ne doit pas etre null ou vide");
                 }
-                this.m_numero = value;
+                m_numero = value;
             }
         }
         #endregion
@@ -72,9 +70,9 @@ namespace CalendrierCours.DAL.SiteInternet
         #region Methodes
         public Cohorte VersEntite()
         {
-            List<Cours> listeCours = this.m_listeCours.Select(cDTo => cDTo.VersEntites()).ToList();
+            List<Cours> listeCours = m_listeCours.Select(cDTo => cDTo.VersEntites()).ToList();
 
-            return new Cohorte(listeCours, this.Numero);
+            return new Cohorte(listeCours, Numero);
         }
         #endregion
     }
@@ -110,10 +108,10 @@ namespace CalendrierCours.DAL.SiteInternet
                 throw new ArgumentNullException("Ne doit pas etre null", nameof(p_seances));
             }
 
-            this.m_enseignant = p_enseignant;
-            this.m_intitule = p_intitule;
-            this.m_seances = p_seances;
-            this.m_numero = p_numero;
+            m_enseignant = p_enseignant;
+            m_intitule = p_intitule;
+            m_seances = p_seances;
+            m_numero = p_numero;
         }
         public CoursInternetDTO(Cours p_cours)
             : this(new ProfesseurInternetDTO(p_cours.Enseignant), p_cours.Numero, p_cours.Intitule, p_cours.Seances.Select(s => new SeanceInternetDTO(s)).ToList())
@@ -123,7 +121,7 @@ namespace CalendrierCours.DAL.SiteInternet
         #region Proprietes
         public ProfesseurInternetDTO Enseignant
         {
-            get { return this.m_enseignant; }
+            get { return m_enseignant; }
             set
             {
                 if (value is null)
@@ -131,12 +129,12 @@ namespace CalendrierCours.DAL.SiteInternet
                     throw new ArgumentNullException("Ne doit pas etre null");
                 }
 
-                this.m_enseignant = value;
+                m_enseignant = value;
             }
         }
         public string Intitule
         {
-            get { return this.m_intitule; }
+            get { return m_intitule; }
             set
             {
                 if (value is null)
@@ -144,12 +142,12 @@ namespace CalendrierCours.DAL.SiteInternet
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_intitule = value;
+                m_intitule = value;
             }
         }
         public string Numero
         {
-            get { return this.m_numero; }
+            get { return m_numero; }
             set
             {
                 if (value is null)
@@ -157,14 +155,14 @@ namespace CalendrierCours.DAL.SiteInternet
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_numero = value;
+                m_numero = value;
             }
         }
         public List<SeanceInternetDTO> Seances
         {
             get
             {
-                return this.m_seances;
+                return m_seances;
             }
             set
             {
@@ -173,7 +171,7 @@ namespace CalendrierCours.DAL.SiteInternet
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_seances = value;
+                m_seances = value;
             }
         }
         #endregion
@@ -181,15 +179,15 @@ namespace CalendrierCours.DAL.SiteInternet
         #region Methodes
         public Cours VersEntites()
         {
-            List<Seance> Seances = this.m_seances.Select(s => s.VersEntite()).ToList();
+            List<Seance> Seances = m_seances.Select(s => s.VersEntite()).ToList();
 
-            return new Cours(this.m_enseignant.VersEntite(), this.m_numero, this.m_intitule, Seances);
+            return new Cours(m_enseignant.VersEntite(), m_numero, m_intitule, Seances);
         }
 
         public override bool Equals(object? obj)
         {
             return obj is CoursInternetDTO cours
-                && this.Enseignant.Equals(cours.Enseignant)
+                && Enseignant.Equals(cours.Enseignant)
                 && Numero == cours.Numero
                 && Intitule == cours.Intitule;
         }
@@ -222,16 +220,16 @@ namespace CalendrierCours.DAL.SiteInternet
 
             if (p_uid == Guid.Empty)
             {
-                this.m_uid = Guid.NewGuid();
+                m_uid = Guid.NewGuid();
             }
             else
             {
-                this.m_uid = p_uid;
+                m_uid = p_uid;
             }
 
-            this.m_dateDebut = p_dateDebut;
-            this.m_dateFin = p_dateFin;
-            this.m_salle = p_salle;
+            m_dateDebut = p_dateDebut;
+            m_dateFin = p_dateFin;
+            m_salle = p_salle;
         }
         public SeanceInternetDTO(Seance p_seance) : this(p_seance.DateDebut, p_seance.DateFin, p_seance.Salle, p_seance.UID) { }
         #endregion
@@ -239,33 +237,33 @@ namespace CalendrierCours.DAL.SiteInternet
         #region Proprietes
         public DateTime DateDebut
         {
-            get { return this.m_dateDebut; }
+            get { return m_dateDebut; }
             set
             {
-                if (value >= this.m_dateFin)
+                if (value >= m_dateFin)
                 {
                     throw new ArgumentException("La date de debut doit etre inferieur a la date de fin");
                 }
 
-                this.m_dateDebut = value;
+                m_dateDebut = value;
             }
         }
         public DateTime DateFin
         {
-            get { return this.m_dateFin; }
+            get { return m_dateFin; }
             set
             {
-                if (value <= this.m_dateDebut)
+                if (value <= m_dateDebut)
                 {
                     throw new ArgumentException("La date de debut doit etre inferieur a la date de fin");
                 }
 
-                this.m_dateFin = value;
+                m_dateFin = value;
             }
         }
         public string Salle
         {
-            get { return this.m_salle; }
+            get { return m_salle; }
             set
             {
                 if (value is null)
@@ -273,24 +271,24 @@ namespace CalendrierCours.DAL.SiteInternet
                     throw new ArgumentException("Ne doit pas etre null");
                 }
 
-                this.m_salle = value;
+                m_salle = value;
             }
         }
-        public Guid UID { get { return this.m_uid; } }
+        public Guid UID { get { return m_uid; } }
         #endregion
 
         #region Methodes
         public Seance VersEntite()
         {
-            return new Seance(this.m_dateDebut, this.m_dateFin, this.m_salle, this.m_uid);
+            return new Seance(m_dateDebut, m_dateFin, m_salle, m_uid);
         }
         public override bool Equals(object? obj)
         {
             return obj is SeanceInternetDTO seance
-                && seance.UID == this.UID
-                && seance.DateDebut == this.DateDebut
-                && seance.DateFin == this.DateFin
-                && seance.Salle == this.Salle;
+                && seance.UID == UID
+                && seance.DateDebut == DateDebut
+                && seance.DateFin == DateFin
+                && seance.Salle == Salle;
         }
         public override int GetHashCode()
         {
@@ -317,8 +315,8 @@ namespace CalendrierCours.DAL.SiteInternet
                 throw new ArgumentNullException("Ne doit pas etre null");
             }
 
-            this.m_nom = p_nom;
-            this.m_prenom = p_prenom;
+            m_nom = p_nom;
+            m_prenom = p_prenom;
         }
         public ProfesseurInternetDTO(Professeur p_enseigant) : this(p_enseigant.Nom, p_enseigant.Prenom) { }
         #endregion
@@ -326,7 +324,7 @@ namespace CalendrierCours.DAL.SiteInternet
         #region Proprietes
         public string Nom
         {
-            get { return this.m_nom; }
+            get { return m_nom; }
             set
             {
                 if (value is null)
@@ -334,12 +332,12 @@ namespace CalendrierCours.DAL.SiteInternet
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_nom = value;
+                m_nom = value;
             }
         }
         public string Prenom
         {
-            get { return this.m_prenom; }
+            get { return m_prenom; }
             set
             {
                 if (value is null)
@@ -347,7 +345,7 @@ namespace CalendrierCours.DAL.SiteInternet
                     throw new ArgumentNullException("Ne doit pas etre null", nameof(value));
                 }
 
-                this.m_prenom = value;
+                m_prenom = value;
             }
         }
         #endregion
@@ -355,7 +353,7 @@ namespace CalendrierCours.DAL.SiteInternet
         #region Methodes
         public Professeur VersEntite()
         {
-            return new Professeur(this.m_nom, this.m_prenom);
+            return new Professeur(m_nom, m_prenom);
         }
         public override bool Equals(object? obj)
         {

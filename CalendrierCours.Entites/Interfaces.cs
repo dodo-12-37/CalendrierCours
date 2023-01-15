@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace CalendrierCours.Entites
+﻿namespace CalendrierCours.Entites
 {
     public interface IExportFichier
     {
@@ -15,6 +13,6 @@ namespace CalendrierCours.Entites
 
     public interface IProprietes
     {
-        string this[string p_nomPropriete] {get; }
+        string this[string p_nomPropriete] { get; }
     }
 }
