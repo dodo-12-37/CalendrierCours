@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(fPrincipal));
             this.lbCohortes = new System.Windows.Forms.ListBox();
             this.msPrincipal = new System.Windows.Forms.MenuStrip();
             this.tsmiFichier = new System.Windows.Forms.ToolStripMenuItem();
@@ -98,7 +99,7 @@
             // 
             this.tsmiQuitter.Name = "tsmiQuitter";
             this.tsmiQuitter.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.tsmiQuitter.Size = new System.Drawing.Size(180, 22);
+            this.tsmiQuitter.Size = new System.Drawing.Size(153, 22);
             this.tsmiQuitter.Text = "&Quitter";
             this.tsmiQuitter.Click += new System.EventHandler(this.tsmiQuitter_Click);
             // 
@@ -372,6 +373,7 @@
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.msPrincipal);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximumSize = new System.Drawing.Size(1100, 405);
             this.MinimumSize = new System.Drawing.Size(1100, 405);
             this.Name = "fPrincipal";

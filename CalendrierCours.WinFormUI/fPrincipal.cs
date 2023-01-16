@@ -58,6 +58,9 @@ namespace CalendrierCours.WinFormUI
         {
             CohorteViewModelWinForm cohorte;
 
+            MessageInformation = "Chargement des cours...";
+            lInformation.Text = MessageInformation;
+
             try
             {
                 cohorte = m_cohortes[lbCohortes.SelectedIndex];
@@ -126,6 +129,8 @@ namespace CalendrierCours.WinFormUI
             m_coursCourant.Categorie = tbCategorie.Text;
             m_coursCourant.Enseignant.Nom = tbNom.Text;
             m_coursCourant.Enseignant.Prenom = tbPrenom.Text;
+
+            this.MiseAjourAffichageCours();
 
             bmajCours.BackColor = m_couleurMajOk;
         }
