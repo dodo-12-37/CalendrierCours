@@ -4,7 +4,7 @@ Application servant à récupérer les informations des séances de cours des di
 
 ## version 2.0
 
- - Récupération des cohortes et des séances depuis https://externe5.csfoy.ca/
+ - Récupération des cohortes et des séances depuis https://externe5.csfoy.ca/horairecohorte/index.php
  - Création des cours en fonction de l'intitulé, du numéro de cours et de l'enseignant
  - Modification des entités :
     - Dissociation du numéro de cours de et l'intitulé
